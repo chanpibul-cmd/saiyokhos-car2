@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบบริหารจัดการยานพาหนะและรถพยาบาล - โรงพยาบาลไทรโยค</title>
+
+  <!-- Google Fonts: Prompt & Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5.3 & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- SweetAlert2 -->
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
+  <!-- DataTables & Responsive -->
+  <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+  <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css" rel="stylesheet">
+
+  <!-- Select2 & Theme -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+
+  <!-- FullCalendar 6 & Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="sidebar-backdrop" onclick="closeMobileSidebar()"></div>
+
+<div id="appContainer">
+  <!-- Desktop Sidebar -->
+  <aside class="app-sidebar">
+    <div class="sidebar-brand">
+      <div class="logo-icon">
+        <i class="bi bi-hospital"></i>
+      </div>
+      <div class="sidebar-brand-text">
+        <h1 class="font-heading">รพ.ไทรโยค</h1>
+        <small>ระบบบริหารรถยนต์</small>
+      </div>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-section-title">บริการหลัก</div>
+      <div class="nav-item">
+        <a class="nav-link active" onclick="switchPage('page-request', this)">
+          <i class="bi bi-file-earmark-plus"></i>
+          <span>ขอใช้รถ</span>
+        </a>
+      </div>
+      <div class="nav-item">
+        <a class="nav-link" onclick="switchPage('page-calendar', this)">
+          <i class="bi bi-calendar-event"></i>
+          <span>ปฏิทินคิวรถ</span>
+        </a>
+      </div>
+
+      <div class="nav-section-title">จัดการยานพาหนะ</div>
+      <div class="nav-item">
+        <a class="nav-link" onclick="checkLoginAndSwitch('page-assign', this)">
+          <i class="bi bi-key"></i>
+          <span>จัดรถ</span>
+          <span class="badge bg-danger" id="badgeCountAssign" style="display:none;">0</span>
+        </a>
+      </div>
+      <div class="nav-item">
+        <a class="nav-link" onclick="checkLoginAndSwitch('page-driver', this)">
+          <i class="bi bi-person-badge"></i>
+          <span>รายงาน พขร.</span>
+          <span class="badge bg-warning text-dark" id="badgeCountDriver" style="display:none;">0</span>
+        </a>
+      </div>
+      <div class="nav-item">
+        <a class="nav-link" onclick="switchPage('page-report', this)">
+          <i class="bi bi-clock-history"></i>
+          <span>ประวัติทั้งหมด & พิมพ์</span>
+        </a>
+      </div>
+
+      <div class="nav-section-title">คลัง & สถิติ</div>
+      <div class="nav-item">
+        <a class="nav-link" onclick="switchPage('page-oil', this)">
+          <i class="bi bi-fuel-pump text-danger"></i>
+          <span>ระบบน้ำมัน</span>
+        </a>
+      </div>
+      <div class="nav-item">
+        <a class="nav-link" onclick="switchPage('page-dashboard', this)">
+          <i class="bi bi-graph-up-arrow"></i>
+          <span>แดชบอร์ด</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <span>v2.0 Modern Car</span>
+      <span class="text-muted"><i class="bi bi-shield-check text-success"></i> Online</span>
+    </div>
+  </aside>
+
+  <!-- Main Content Layout -->
+  <div class="app-main">
+    <!-- Topbar -->
+    <header class="app-topbar">
+      <div class="topbar-left">
+        <button class="btn-sidebar-toggle" onclick="toggleMobileSidebar()" aria-label="Toggle Sidebar">
+          <i class="bi bi-list"></i>
+        </button>
+        <div>
+          <h2 class="h5 m-0 font-heading text-dark d-none d-md-block">โรงพยาบาลไทรโยค</h2>
+          <small class="text-muted d-none d-md-block">ระบบบริหารจัดการยานพาหนะและรถพยาบาล</small>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="clock-widget d-none d-sm-flex">
+          <i class="bi bi-clock"></i>
+          <span id="topbarClock">--:--:--</span>
+        </div>
+        <div id="syncStatusBadge" class="sync-status-badge">
+          <span class="dot"></span> เชื่อมต่อฐานข้อมูล
+        </div>
+        <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="loadData(false)" title="ดึงข้อมูลล่าสุด">
+          <i class="bi bi-arrow-clockwise me-1"></i> รีเฟรช
+        </button>
+      </div>
+    </header>
+
+    <!-- Page Content Container -->
+    <main class="content-wrapper">
+
+      <!-- ================= 1. หน้าเขียนขอใช้รถ ================= -->
+      <section id="page-request" class="page-section active">
+        <div class="page-header">
+          <h2 class="page-header-title"><i class="bi bi-file-earmark-plus text-primary"></i> แบบฟอร์มขอใช้รถยนต์</h2>
+          <p class="page-header-subtitle">กรอกรายละเอียดเพื่อจองคิวรถยนต์และส่งต่อฝ่ายบริหารจัดการจัดสรรรถและพนักงานขับรถ</p>
+        </div>
+
+        <div class="app-card mx-auto" style="max-width: 860px;">
+          <form id="formRequest">
+            <!-- ตอนที่ 1: ข้อมูลผู้ขอ -->
+            <div class="form-section-title">
+              <i class="bi bi-person-circle"></i> ตอนที่ 1: ข้อมูลผู้ขอและกลุ่มงาน
+            </div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label" for="req_c">ผู้ขอใช้รถ <span class="text-danger">*</span></label>
+                <select id="req_c" class="form-select" required>
+                  <option value="" disabled selected>กำลังโหลดรายชื่อ...</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="req_d">ฝ่าย / กลุ่มงาน</label>
+                <input type="text" id="req_d" class="form-control" placeholder="กลุ่มงานจะแสดงอัตโนมัติ" readonly>
+              </div>
+            </div>
+
+            <!-- ตอนที่ 2: วันและเวลาเดินทาง -->
+            <div class="form-section-title">
+              <i class="bi bi-calendar-range"></i> ตอนที่ 2: วันและเวลาเดินทาง
+            </div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label" for="req_e">ออกเดินทาง วันที่และเวลา <span class="text-danger">*</span></label>
+                <input type="datetime-local" id="req_e" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="req_f">กลับถึง วันที่และเวลา <span class="text-danger">*</span></label>
+                <input type="datetime-local" id="req_f" class="form-control" required>
+              </div>
+              <div class="col-12">
+                <div id="tripDurationBadge" class="trip-duration-badge" style="display:none;">
+                  <i class="bi bi-clock me-1"></i> ระยะเวลาการใช้รถ: <b>-</b>
+                </div>
+              </div>
+            </div>
+
+            <!-- ตอนที่ 3: วัตถุประสงค์และสถานที่ -->
+            <div class="form-section-title">
+              <i class="bi bi-geo-alt"></i> ตอนที่ 3: วัตถุประสงค์และสถานที่
+            </div>
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label" for="req_g">เรื่อง / ภารกิจราชการ <span class="text-danger">*</span></label>
+                <input type="text" id="req_g" class="form-control" placeholder="เช่น ไปประชุมวิชาการ, นำส่งผู้ป่วยต่อ, เยี่ยมผู้ป่วยติดเตียง" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="req_h">สถานที่ไปราชการ <span class="text-danger">*</span></label>
+                <input type="text" id="req_h" class="form-control" placeholder="เช่น สำนักงานสาธารณสุขจังหวัดกาญจนบุรี, รพ.พหลพลพยุหเสนา" required>
+              </div>
+            </div>
+
+            <!-- ตอนที่ 4: ผู้ร่วมเดินทาง -->
+            <div class="form-section-title">
+              <i class="bi bi-people"></i> ตอนที่ 4: ผู้ร่วมเดินทาง
+            </div>
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label" for="req_i">จำนวนคนนั่ง <span class="text-danger">*</span></label>
+                <input type="number" id="req_i" class="form-control" min="1" value="1" required>
+                <small class="text-muted" style="font-size:0.75rem;">(ไม่รวมคนขับ)</small>
+              </div>
+              <div class="col-md-9">
+                <label class="form-label" for="req_j">ได้แก่ (ระบุรายชื่อ) <span class="text-danger">*</span></label>
+                <input type="text" id="req_j" class="form-control" placeholder="ระบุชื่อผู้ร่วมเดินทางทุกคน" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="req_k">รายละเอียดเพิ่มเติม (ถ้ามี)</label>
+                <textarea id="req_k" class="form-control" rows="2" placeholder="เช่น สัมภาระอุปกรณ์การแพทย์, อุปกรณ์ตรวจคัดกรอง"></textarea>
+              </div>
+            </div>
+
+            <!-- ตอนที่ 5: ประเภทการใช้รถ -->
+            <div class="form-section-title">
+              <i class="bi bi-truck"></i> ตอนที่ 5: ประเภทการใช้รถ
+            </div>
+            <div class="mb-3">
+              <select id="req_l" class="form-select mb-2" required>
+                <option value="" disabled selected>เลือกประเภทการใช้รถ...</option>
+                <option value="ประชุม/อบรม/ในจังหวัด">ประชุม/อบรม/ในจังหวัด</option>
+                <option value="ประชุม/อบรม/ต่างจังหวัด">ประชุม/อบรม/ต่างจังหวัด</option>
+                <option value="ส่ง lab ในจังหวัด">ส่ง lab ในจังหวัด</option>
+                <option value="ส่ง lab ต่างจังหวัด">ส่ง lab ต่างจังหวัด</option>
+                <option value="ออกหน่วยต่างๆ">ออกหน่วยต่างๆ</option>
+                <option value="เยี่ยมบ้าน">เยี่ยมบ้าน</option>
+                <option value="refer ในจังหวัด">refer ในจังหวัด</option>
+                <option value="refer ต่างจังหวัด">refer ต่างจังหวัด</option>
+                <option value="EMS">EMS</option>
+                <option value="ออกชันสูตร">ออกชันสูตร</option>
+                <option value="อื่นๆ">อื่นๆ</option>
+              </select>
+
+              <!-- ชิปปุ่มลัดสำหรับเลือกได้รวดเร็ว -->
+              <div class="usage-chips-grid">
+                <div class="usage-chip-btn" data-value="ประชุม/อบรม/ในจังหวัด"><i class="bi bi-people text-primary"></i> ประชุมใน จ.</div>
+                <div class="usage-chip-btn" data-value="ประชุม/อบรม/ต่างจังหวัด"><i class="bi bi-briefcase text-indigo"></i> ประชุมต่าง จ.</div>
+                <div class="usage-chip-btn" data-value="ส่ง lab ในจังหวัด"><i class="bi bi-droplet text-info"></i> ส่ง lab ใน จ.</div>
+                <div class="usage-chip-btn" data-value="ส่ง lab ต่างจังหวัด"><i class="bi bi-eyedropper text-cyan"></i> ส่ง lab ต่าง จ.</div>
+                <div class="usage-chip-btn" data-value="ออกหน่วยต่างๆ"><i class="bi bi-hospital text-teal"></i> ออกหน่วยต่างๆ</div>
+                <div class="usage-chip-btn" data-value="เยี่ยมบ้าน"><i class="bi bi-house-heart text-success"></i> เยี่ยมบ้าน</div>
+                <div class="usage-chip-btn" data-value="refer ในจังหวัด"><i class="bi bi-truck text-warning"></i> refer ใน จ.</div>
+                <div class="usage-chip-btn" data-value="refer ต่างจังหวัด"><i class="bi bi-truck-flatbed text-orange"></i> refer ต่าง จ.</div>
+                <div class="usage-chip-btn" data-value="EMS"><i class="bi bi-shield-exclamation text-danger"></i> EMS</div>
+                <div class="usage-chip-btn" data-value="ออกชันสูตร"><i class="bi bi-journal-medical text-purple"></i> ออกชันสูตร</div>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-top d-flex gap-2">
+              <button type="reset" class="btn btn-light px-4 rounded-pill">ล้างข้อมูล</button>
+              <button type="submit" class="btn btn-primary flex-grow-1 py-2 rounded-pill font-heading">
+                <i class="bi bi-check-circle me-1"></i> บันทึกและส่งคำขอใช้รถ
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ================= 2. หน้าปฏิทิน ================= -->
+      <section id="page-calendar" class="page-section">
+        <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div>
+            <h2 class="page-header-title"><i class="bi bi-calendar-event text-primary"></i> ตารางคิวการใช้รถ</h2>
+            <p class="page-header-subtitle">ตรวจสอบตารางเวลา คิวรถที่ได้รับการจัดสรร และสถานะภารกิจทั้งหมด</p>
+          </div>
+        </div>
+
+        <!-- Quick Summary Counters & Filters -->
+        <div class="row g-2 mb-3 align-items-center">
+          <div class="col-md-7 d-flex flex-wrap gap-2">
+            <button class="btn btn-sm btn-outline-secondary rounded-pill active" onclick="carCalendar?.setFilter('all'); $(this).addClass('active').siblings().removeClass('active');">
+              ทั้งหมด (<span id="calBadgeAll">0</span>)
+            </button>
+            <button class="btn btn-sm btn-outline-danger rounded-pill" onclick="carCalendar?.setFilter('pending'); $(this).addClass('active').siblings().removeClass('active');">
+              🔴 รอจัดรถ (<span id="calBadgePending">0</span>)
+            </button>
+            <button class="btn btn-sm btn-outline-warning rounded-pill" onclick="carCalendar?.setFilter('assigned'); $(this).addClass('active').siblings().removeClass('active');">
+              🟡 รอขับรถ (<span id="calBadgeAssigned">0</span>)
+            </button>
+            <button class="btn btn-sm btn-outline-success rounded-pill" onclick="carCalendar?.setFilter('completed'); $(this).addClass('active').siblings().removeClass('active');">
+              🟢 เสร็จสิ้น (<span id="calBadgeCompleted">0</span>)
+            </button>
+          </div>
+          <div class="col-md-5">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+              <input type="text" class="form-control" placeholder="ค้นหาตามสถานที่, ผู้ขอ, ทะเบียน..." oninput="carCalendar?.setSearch(this.value)">
+            </div>
+          </div>
+        </div>
+
+        <div class="app-card p-3">
+          <div id="calendar"></div>
+        </div>
+      </section>
+
+      <!-- ================= 3. หน้าจัดรถ ================= -->
+      <section id="page-assign" class="page-section">
+        <div class="page-header">
+          <h2 class="page-header-title"><i class="bi bi-key text-primary"></i> จัดการจัดรถยนต์และคนขับ</h2>
+          <p class="page-header-subtitle">กำหนดพนักงานขับรถและทะเบียนรถสำหรับรายการคำขอที่ส่งเข้ามา</p>
+        </div>
+
+        <div class="app-card">
+          <div class="card-header-clean">
+            <h3><i class="bi bi-list-check me-2 text-primary"></i>รายการคำขอจัดรถ</h3>
+          </div>
+          <div class="table-responsive">
+            <table id="tableAssign" class="table table-hover w-100 align-middle">
+              <thead>
+                <tr>
+                  <th style="width: 120px;">จัดการ</th>
+                  <th>ID</th>
+                  <th>ออกเดินทาง</th>
+                  <th>กลับถึง</th>
+                  <th>ผู้ขอ</th>
+                  <th>เรื่อง</th>
+                  <th>สถานที่</th>
+                  <th>ประเภท</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 4. หน้ารายงาน พขร. ================= -->
+      <section id="page-driver" class="page-section">
+        <div class="page-header">
+          <h2 class="page-header-title"><i class="bi bi-person-badge text-primary"></i> รายงานบันทึกการขับรถ (พขร.)</h2>
+          <p class="page-header-subtitle">สำหรับพนักงานขับรถบันทึกเวลาปฏิบัติงานจริง เลขไมล์กิโลเมตร และค่าน้ำมัน</p>
+        </div>
+
+        <div class="app-card">
+          <div class="card-header-clean flex-wrap gap-2">
+            <h3><i class="bi bi-speedometer me-2 text-primary"></i>ภารกิจที่ได้รับมอบหมาย</h3>
+            <div class="d-flex align-items-center gap-2">
+              <label for="filterDriver" class="small text-muted text-nowrap">กรองคนขับ:</label>
+              <select id="filterDriver" class="form-select form-select-sm" style="min-width: 200px;">
+                <option value="">-- กรองผู้ขับรถทั้งหมด --</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table id="tableDriver" class="table table-hover w-100 align-middle">
+              <thead>
+                <tr>
+                  <th style="width: 120px;">จัดการ</th>
+                  <th>ID</th>
+                  <th>ขอวันที่</th>
+                  <th>ถึงวันที่</th>
+                  <th>ผู้ขอ</th>
+                  <th>สถานที่</th>
+                  <th>ผู้ขับรถ</th>
+                  <th>ทะเบียน</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 5. หน้าประวัติทั้งหมดและพิมพ์ ================= -->
+      <section id="page-report" class="page-section">
+        <div class="page-header">
+          <h2 class="page-header-title"><i class="bi bi-clock-history text-primary"></i> ประวัติการใช้รถและพิมพ์เอกสาร</h2>
+          <p class="page-header-subtitle">ค้นหาประวัติย้อนหลัง ตรวจสอบรายละเอียด และสั่งพิมพ์เอกสารขอใช้รถมาตรฐาน A4</p>
+        </div>
+
+        <div class="app-card">
+          <div class="card-header-clean">
+            <h3><i class="bi bi-journal-text me-2 text-primary"></i>ประวัติการใช้รถทั้งหมด</h3>
+          </div>
+          <div class="table-responsive">
+            <table id="tableReport" class="table table-hover w-100 align-middle">
+              <thead>
+                <tr>
+                  <th>ดูข้อมูล</th>
+                  <th>ID</th>
+                  <th>สถานะ</th>
+                  <th>ขอวันที่</th>
+                  <th>ถึงวันที่</th>
+                  <th>ผู้ขอ</th>
+                  <th>สถานที่</th>
+                  <th>คนขับ</th>
+                  <th>ทะเบียน</th>
+                  <th>ระยะทาง</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 6. หน้าแดชบอร์ด ================= -->
+      <section id="page-dashboard" class="page-section">
+        <div class="page-header">
+          <h2 class="page-header-title"><i class="bi bi-graph-up-arrow text-primary"></i> แดชบอร์ดสรุปข้อมูลการใช้รถ</h2>
+          <p class="page-header-subtitle">สถิติภาพรวม ตัวชี้วัดการใช้ยานพาหนะ และแนวโน้มการปฏิบัติภารกิจ</p>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="app-card p-3 mb-4">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+              <label class="form-label" for="dashFilterType">ช่วงเวลาที่ต้องการดู:</label>
+              <select id="dashFilterType" class="form-select" onchange="
+                const val = this.value;
+                document.getElementById('f-date').style.display = val === 'date' ? 'flex' : 'none';
+                document.getElementById('f-month').style.display = val === 'month' ? 'block' : 'none';
+                document.getElementById('f-fy').style.display = val === 'fy' ? 'block' : 'none';
+              ">
+                <option value="all">ดูข้อมูลทั้งหมด</option>
+                <option value="date">ระบุช่วงวันที่</option>
+                <option value="month">รายเดือน</option>
+                <option value="fy" selected>ตามปีงบประมาณ (พ.ศ.)</option>
+              </select>
+            </div>
+            <div class="col-md-7">
+              <div id="f-date" style="display:none;" class="row g-2">
+                <div class="col-6">
+                  <label class="form-label">ตั้งแต่วันที่</label>
+                  <input type="date" id="dashStartDate" class="form-control">
+                </div>
+                <div class="col-6">
+                  <label class="form-label">ถึงวันที่</label>
+                  <input type="date" id="dashEndDate" class="form-control">
+                </div>
+              </div>
+              <div id="f-month" style="display:none;">
+                <label class="form-label">เลือกเดือน-ปี</label>
+                <input type="month" id="dashMonth" class="form-control">
+              </div>
+              <div id="f-fy">
+                <label class="form-label">เลือกปีงบประมาณ</label>
+                <select id="dashFY" class="form-select"></select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-primary w-100 py-2 rounded-pill" onclick="carDashboard?.update()">
+                <i class="bi bi-search me-1"></i> กรองสถิติ
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 KPI Cards -->
+        <div class="row g-3 mb-4">
+          <div class="col-sm-6 col-xl-3">
+            <div class="kpi-card">
+              <div class="kpi-icon-box kpi-icon-primary">
+                <i class="bi bi-truck"></i>
+              </div>
+              <div class="kpi-info">
+                <h5>จำนวนเที่ยววิ่ง</h5>
+                <div class="kpi-value" id="kpiTotalTrips">0</div>
+                <small>เที่ยวทั้งหมดในช่วงเวลา</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="kpi-card">
+              <div class="kpi-icon-box kpi-icon-success">
+                <i class="bi bi-signpost-2"></i>
+              </div>
+              <div class="kpi-info">
+                <h5>ระยะทางรวม</h5>
+                <div class="kpi-value" id="kpiTotalKm">0 กม.</div>
+                <small id="kpiAvgKm">- กม./เที่ยว</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="kpi-card">
+              <div class="kpi-icon-box kpi-icon-amber">
+                <i class="bi bi-fuel-pump"></i>
+              </div>
+              <div class="kpi-info">
+                <h5>ค่าน้ำมันรวม</h5>
+                <div class="kpi-value" id="kpiTotalFuelCost">฿0.00</div>
+                <small id="kpiTotalFuelLiters">0 ลิตร</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="kpi-card">
+              <div class="kpi-icon-box kpi-icon-rose">
+                <i class="bi bi-check2-circle"></i>
+              </div>
+              <div class="kpi-info">
+                <h5>เสร็จสิ้นสมบูรณ์</h5>
+                <div class="kpi-value" id="kpiCompletedTrips">0</div>
+                <small>รายการลงไมล์เรียบร้อย</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="row g-4">
+          <!-- 1. กราฟรายวัน -->
+          <div class="col-12">
+            <div class="app-card">
+              <div class="card-header-clean">
+                <h3><i class="bi bi-activity me-2 text-primary"></i>สถิติความถี่การใช้รถยนต์รายวัน (ครั้ง/วัน)</h3>
+              </div>
+              <div style="height: 280px; position: relative;">
+                <canvas id="chartDaily"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. จำนวนครั้งแต่ละคัน -->
+          <div class="col-lg-6">
+            <div class="app-card">
+              <div class="card-header-clean">
+                <h3><i class="bi bi-truck-front me-2 text-success"></i>สถิติการใช้งานรถแต่ละคัน (วัน)</h3>
+              </div>
+              <div style="height: 300px; position: relative;">
+                <canvas id="chartCarCount"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. จำนวนครั้ง พขร. -->
+          <div class="col-lg-6">
+            <div class="app-card">
+              <div class="card-header-clean">
+                <h3><i class="bi bi-person-check me-2 text-warning"></i>สถิติภารกิจของ พขร. แต่ละท่าน (วัน)</h3>
+              </div>
+              <div style="height: 300px; position: relative;">
+                <canvas id="chartDriverCount"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. ระยะทางสะสม -->
+          <div class="col-lg-7">
+            <div class="app-card">
+              <div class="card-header-clean">
+                <h3><i class="bi bi-speedometer2 me-2 text-danger"></i>ระยะทางที่ขับสะสมแยกตามคัน (กม.)</h3>
+              </div>
+              <div style="height: 300px; position: relative;">
+                <canvas id="chartCarKm"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. ประเภทการใช้รถ -->
+          <div class="col-lg-5">
+            <div class="app-card">
+              <div class="card-header-clean">
+                <h3><i class="bi bi-pie-chart me-2 text-primary"></i>สัดส่วนประเภทการใช้รถ</h3>
+              </div>
+              <div style="height: 300px; position: relative;">
+                <canvas id="chartCarType"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 7. หน้าระบบน้ำมัน ================= -->
+      <section id="page-oil" class="page-section">
+        <div class="page-header">
+          <h2 class="page-header-title"><i class="bi bi-fuel-pump text-danger"></i> ระบบจัดการน้ำมันคลัง พขร.</h2>
+          <p class="page-header-subtitle">บันทึกการนำเข้า-เบิกออกน้ำมันเชื้อเพลิง ตรวจสอบยอดคงเหลือ และเซ็นอนุมัติดิจิทัล</p>
+        </div>
+
+        <div class="row justify-content-center">
+          <div class="col-lg-8 col-xl-6">
+            <!-- Balance Banner -->
+            <div class="oil-balance-banner">
+              <div class="small text-uppercase opacity-75">ยอดน้ำมันคงเหลือในคลัง</div>
+              <div class="oil-balance-val" id="oilBalanceDisplay">0.00</div>
+              <div class="small opacity-75">ลิตร (คำนวณจากรายการที่ผ่านการอนุมัติแล้วเท่านั้น)</div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="app-card p-4">
+              <div class="d-grid gap-3">
+                <button class="btn btn-danger btn-lg py-3 rounded-4 d-flex align-items-center justify-content-center gap-2 font-heading" onclick="openOilRequest()">
+                  <i class="bi bi-pencil-square fs-4"></i>
+                  <span>1. บันทึก นำเข้า / เบิกออกน้ำมัน</span>
+                </button>
+                <button class="btn btn-success btn-lg py-3 rounded-4 d-flex align-items-center justify-content-center gap-2 font-heading position-relative" onclick="checkLoginOilApprove()">
+                  <i class="bi bi-shield-check fs-4"></i>
+                  <span>2. พิจารณาอนุมัติรายการ (ผู้มีสิทธิ์)</span>
+                  <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-3" id="oilPendingBadge" style="display:none;">0</span>
+                </button>
+                <button class="btn btn-outline-secondary btn-lg py-3 rounded-4 d-flex align-items-center justify-content-center gap-2 font-heading" onclick="openOilReport()">
+                  <i class="bi bi-journal-text fs-4"></i>
+                  <span>3. รายงานประวัติการใช้น้ำมันทั้งหมด</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer Copyright -->
+    <footer class="text-center text-muted py-4 small border-top">
+      &copy; 2026 ระบบบริหารจัดการยานพาหนะและรถพยาบาล โรงพยาบาลไทรโยค<br>
+      พัฒนาและปรับปรุงระบบใหม่สำหรับบุคลากรสาธารณสุข
+    </footer>
+  </div>
+</div>
+
+<!-- ================= Mobile Bottom Navigation Bar ================= -->
+<nav class="bottom-nav">
+  <ul class="bottom-nav-items">
+    <li class="bottom-nav-item">
+      <a class="bottom-nav-link active" onclick="switchPage('page-request', this)">
+        <i class="bi bi-file-earmark-plus"></i>
+        <span>ขอรถ</span>
+      </a>
+    </li>
+    <li class="bottom-nav-item">
+      <a class="bottom-nav-link" onclick="switchPage('page-calendar', this)">
+        <i class="bi bi-calendar-event"></i>
+        <span>ปฏิทิน</span>
+      </a>
+    </li>
+    <li class="bottom-nav-item">
+      <a class="bottom-nav-link" onclick="checkLoginAndSwitch('page-assign', this)">
+        <i class="bi bi-key"></i>
+        <span>จัดรถ</span>
+      </a>
+    </li>
+    <li class="bottom-nav-item">
+      <a class="bottom-nav-link" onclick="checkLoginAndSwitch('page-driver', this)">
+        <i class="bi bi-speedometer2"></i>
+        <span>พขร.</span>
+      </a>
+    </li>
+    <li class="bottom-nav-item">
+      <a class="bottom-nav-link" onclick="switchPage('page-dashboard', this)">
+        <i class="bi bi-graph-up-arrow"></i>
+        <span>สถิติ</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<!-- ================= Modals ================= -->
+
+<!-- 1. Modal จัดรถ -->
+<div class="modal fade" id="modalAssign" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow">
+      <div class="modal-header bg-primary text-white rounded-top-4">
+        <h5 class="modal-title font-heading"><i class="bi bi-key me-2"></i>จัดรถ (ID: <span id="assign_id_lbl"></span>)</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <!-- Trip Request Summary Card -->
+        <div class="p-3 bg-light rounded-3 mb-3 border">
+          <div class="small text-muted mb-1">ข้อมูลการเดินทาง:</div>
+          <div class="fw-bold" id="assign_summary_subj">-</div>
+          <div class="small text-primary mb-1"><i class="bi bi-geo-alt"></i> <span id="assign_summary_place">-</span></div>
+          <div class="small text-muted mb-1"><i class="bi bi-person"></i> ผู้ขอ: <span id="assign_summary_req">-</span> (<span id="assign_summary_group">-</span>)</div>
+          <div class="small text-muted mb-1"><i class="bi bi-clock"></i> เวลา: <span id="assign_summary_time">-</span></div>
+          <div class="small text-muted"><i class="bi bi-people"></i> ผู้โดยสาร: <span id="assign_summary_passengers">-</span></div>
+        </div>
+
+        <form id="formAssign">
+          <input type="hidden" id="assign_id">
+          <div class="mb-3">
+            <label class="form-label" for="assign_m">พนักงานขับรถ <span class="text-danger">*</span></label>
+            <select id="assign_m" class="form-select" required>
+              <option value="" disabled selected>เลือกพนักงานขับรถ...</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="assign_n">ทะเบียนรถ <span class="text-danger">*</span></label>
+            <select id="assign_n" class="form-select" required>
+              <option value="" disabled selected>เลือกทะเบียนรถ...</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="assign_o">รุ่นรถยนต์</label>
+            <input type="text" id="assign_o" class="form-control" readonly placeholder="รุ่นรถจะแสดงอัตโนมัติ">
+          </div>
+          <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill font-heading">
+            <i class="bi bi-check2-circle me-1"></i> ยืนยันการจัดรถ
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. Modal รายงาน พขร. -->
+<div class="modal fade" id="modalDriver" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow">
+      <div class="modal-header bg-warning text-dark rounded-top-4">
+        <h5 class="modal-title font-heading"><i class="bi bi-speedometer2 me-2"></i>บันทึกรายงานการขับรถ (ID: <span id="driver_id_lbl"></span>)</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <!-- Trip Info Banner -->
+        <div class="p-3 bg-light rounded-3 mb-3 border d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div>
+            <div class="small text-muted">สถานที่ไป:</div>
+            <h6 class="fw-bold m-0" id="driver_summary_place">-</h6>
+            <div class="small text-muted">รถยนต์: <span id="driver_summary_plate" class="text-dark fw-medium">-</span></div>
+          </div>
+          <div>
+            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill" id="btnUseReqTime">
+              <i class="bi bi-magic me-1"></i> ใช้วันเวลาตามใบขอ
+            </button>
+          </div>
+        </div>
+
+        <form id="formDriver">
+          <input type="hidden" id="driver_id">
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label" for="driver_p">ออกเดินทางจริง วันที่/เวลา <span class="text-danger">*</span></label>
+              <input type="datetime-local" id="driver_p" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="driver_q">กลับถึงจริง วันที่/เวลา <span class="text-danger">*</span></label>
+              <input type="datetime-local" id="driver_q" class="form-control" required>
+            </div>
+          </div>
+
+          <!-- Odometer Display Box -->
+          <div class="odometer-box">
+            <div class="odometer-title">ระยะทางปฏิบัติภารกิจรวม (กิโลเมตร)</div>
+            <div class="odometer-num text-info" id="odometerDiffDisplay">0 กม.</div>
+            <div class="small mt-1 text-light" id="fuelEfficiencyText"></div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label" for="driver_r">เลขไมล์เริ่มต้น <span class="text-danger">*</span></label>
+              <input type="number" id="driver_r" class="form-control form-control-lg text-center font-heading" placeholder="0" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="driver_s">เลขไมล์กลับถึง <span class="text-danger">*</span></label>
+              <input type="number" id="driver_s" class="form-control form-control-lg text-center font-heading" placeholder="0" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="driver_t">ผลต่างกิโลเมตร</label>
+              <input type="number" id="driver_t" class="form-control form-control-lg text-center font-heading" readonly>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label" for="driver_u">เติมน้ำมันระหว่างทาง (ลิตร)</label>
+              <input type="number" step="0.01" id="driver_u" class="form-control" placeholder="0.00">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="driver_v">เป็นเงิน (บาท)</label>
+              <input type="number" step="0.01" id="driver_v" class="form-control" placeholder="0.00">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-success w-100 py-2 rounded-pill font-heading">
+            <i class="bi bi-check2-circle me-1"></i> บันทึกรายงานการขับรถ
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. Modal ดูรายละเอียด & พิมพ์ -->
+<div class="modal fade" id="modalView" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow">
+      <div class="modal-header bg-light border-bottom">
+        <h5 class="modal-title font-heading"><i class="bi bi-file-earmark-text text-primary me-2"></i>รายละเอียดคำขอ (ID: <span id="view_id_lbl"></span>)</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div id="viewBody" class="row"></div>
+      </div>
+      <div class="modal-footer d-flex justify-content-between bg-light rounded-bottom-4">
+        <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">ปิด</button>
+        <button type="button" class="btn btn-primary rounded-pill px-4 font-heading" id="btnPrintDoc" onclick="printDoc()">
+          <i class="bi bi-printer me-1"></i> สั่งพิมพ์ใบขอใช้รถ (A4)
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 4. Modal บันทึกนำเข้า/เบิกออกน้ำมัน -->
+<div class="modal fade" id="modalOilRequest" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow">
+      <div class="modal-header bg-danger text-white rounded-top-4">
+        <h5 class="modal-title font-heading"><i class="bi bi-fuel-pump me-2"></i>บันทึก นำเข้า / เบิกออก น้ำมัน</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <form id="formOilRequest">
+          <div class="mb-3">
+            <label class="form-label fw-bold" for="oilType">ประเภทรายการ <span class="text-danger">*</span></label>
+            <select id="oilType" class="form-select fw-bold" onchange="toggleOilType()" required>
+              <option value="" disabled selected>เลือกประเภท...</option>
+              <option value="in">📥 นำเข้าคลัง</option>
+              <option value="out">📤 เบิกออกไปใช้</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="oilQty">จำนวน (ลิตร) <span class="text-danger">*</span></label>
+            <input type="number" step="0.01" id="oilQty" class="form-control form-control-lg text-center font-heading fw-bold" placeholder="0.00" required>
+          </div>
+          <div class="mb-3" id="oilCarDiv" style="display:none;">
+            <label class="form-label" for="oilCar">ใช้ที่รถ (ทะเบียน)</label>
+            <select id="oilCar" class="form-select">
+              <option value="">-- ไม่ระบุ / โหลดข้อมูล... --</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="oilDetail">รายละเอียด / วัตถุประสงค์ <span class="text-danger">*</span></label>
+            <textarea id="oilDetail" class="form-control" rows="2" placeholder="ระบุเหตุผลการเบิกหรือการนำเข้า" required></textarea>
+          </div>
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="form-label m-0">ลายเซ็นผู้บันทึก/ผู้ขอ <span class="text-danger">*</span></label>
+              <button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="sigPad1?.clear()">ล้างลายเซ็น</button>
+            </div>
+            <div class="sig-box-container">
+              <canvas id="sigCanvas1" class="sig-canvas"></canvas>
+            </div>
+            <small class="text-muted">ใช้นิ้วหรือเมาส์เซ็นชื่อลงในกรอบ</small>
+          </div>
+          <button type="submit" class="btn btn-danger w-100 py-2 rounded-pill font-heading">
+            <i class="bi bi-send me-1"></i> ส่งรายการ (รออนุมัติ)
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5. Modal รายการน้ำมันรอนุมัติ -->
+<div class="modal fade" id="modalOilPending" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow">
+      <div class="modal-header bg-success text-white rounded-top-4">
+        <h5 class="modal-title font-heading"><i class="bi bi-shield-check me-2"></i>รายการน้ำมันที่รอนุมัติ</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="table-responsive">
+          <table id="tableOilPending" class="table table-hover w-100 align-middle text-center">
+            <thead>
+              <tr>
+                <th style="width: 110px;">จัดการ</th>
+                <th>วันที่/เวลา</th>
+                <th>ประเภท</th>
+                <th>จำนวน</th>
+                <th>ใช้ที่รถ</th>
+                <th>รายละเอียด</th>
+                <th>ลายเซ็นผู้ขอ</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 6. Modal เซ็นอนุมัติน้ำมัน -->
+<div class="modal fade" id="modalOilApprove" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow">
+      <div class="modal-header bg-success text-white rounded-top-4">
+        <h5 class="modal-title font-heading"><i class="bi bi-pen me-2"></i>เซ็นอนุมัติรายการน้ำมัน</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <form id="formOilApprove">
+          <input type="hidden" id="oilApproveRow">
+          <div class="alert alert-info" id="oilApproveSummary"></div>
+          <div class="mb-3">
+            <label class="form-label" for="oilNote">หมายเหตุการอนุมัติ (ถ้ามี)</label>
+            <textarea id="oilNote" class="form-control" rows="2" placeholder="เช่น อนุมัติเบิกตามภารกิจ"></textarea>
+          </div>
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="form-label m-0">ลายเซ็นผู้อนุมัติ <span class="text-danger">*</span></label>
+              <button type="button" class="btn-link btn btn-sm text-danger p-0" onclick="sigPad2?.clear()">ล้างลายเซ็น</button>
+            </div>
+            <div class="sig-box-container">
+              <canvas id="sigCanvas2" class="sig-canvas"></canvas>
+            </div>
+            <small class="text-muted">ใช้นิ้วหรือเมาส์เซ็นชื่อลงในกรอบ</small>
+          </div>
+          <button type="submit" class="btn btn-success w-100 py-2 rounded-pill font-heading">
+            <i class="bi bi-check-lg me-1"></i> อนุมัติและอัปเดตยอดคงเหลือ
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 7. Modal รายงานประวัติน้ำมันทั้งหมด -->
+<div class="modal fade" id="modalOilReport" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow">
+      <div class="modal-header bg-secondary text-white rounded-top-4">
+        <h5 class="modal-title font-heading"><i class="bi bi-journal-text me-2"></i>รายงานประวัติการเคลื่อนไหวน้ำมัน</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="table-responsive">
+          <table id="tableOilReport" class="table table-hover w-100 align-middle text-center" style="font-size:0.9rem;">
+            <thead>
+              <tr>
+                <th>สถานะ</th>
+                <th>วันที่</th>
+                <th>นำเข้า</th>
+                <th>เบิกออก</th>
+                <th>คงเหลือ</th>
+                <th>ใช้ที่รถ</th>
+                <th>รายละเอียด</th>
+                <th>ผู้ขอ</th>
+                <th>ผู้อนุมัติ</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= แบบฟอร์มสั่งพิมพ์ A4 ทางราชการ ================= -->
+<div id="printTemplate">
+  <div class="text-center mb-3">
+    <h4 style="font-family:'Sarabun', sans-serif; font-weight: bold; margin: 0;">แบบขออนุญาตใช้รถยนต์ส่วนกลาง / รถพยาบาล</h4>
+    <h5 style="font-family:'Sarabun', sans-serif; margin: 2px 0 0 0;">โรงพยาบาลไทรโยค อำเภอไทรโยค จังหวัดกาญจนบุรี</h5>
+  </div>
+
+  <div class="d-flex justify-content-end mb-3">
+    <div style="width: 260px;">
+      เลขที่รับ: <span class="print-line" style="width: 170px;" id="prt_id"></span><br>
+      วันที่: <span class="print-line" style="width: 195px;" id="prt_date"></span>
+    </div>
+  </div>
+
+  <div>
+    ข้าพเจ้า <span class="print-line" style="width: 320px;" id="prt_req"></span>
+    ฝ่าย/กลุ่มงาน <span class="print-line" style="width: 250px;" id="prt_group"></span>
+  </div>
+  <div>
+    ขออนุญาตใช้รถยนต์เพื่อไปราชการ(งาน/กิจกรรม) <span class="print-line" style="width: 410px;" id="prt_subj"></span>
+  </div>
+  <div>
+    ที่ <span class="print-line" style="width: 690px;" id="prt_place"></span>
+  </div>
+  <div>
+    โดยมีคนนั่ง(ไม่รวมถึงคนขับ) <span class="print-line" style="width: 80px;" id="prt_qty"></span> คน
+    ได้แก่ <span class="print-line" style="width: 360px;" id="prt_include"></span>
+  </div>
+  <div class="mb-2">
+    <span class="print-line" style="width: 100%;"></span>
+  </div>
+  <div>
+    ออกเดินทาง วันที่ <span class="print-line" style="width: 310px;" id="prt_sd"></span>
+    เวลา <span class="print-line" style="width: 180px;" id="prt_st"></span>
+  </div>
+  <div class="mb-4">
+    กลับถึง &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;วันที่ <span class="print-line" style="width: 310px;" id="prt_ed"></span>
+    เวลา <span class="print-line" style="width: 180px;" id="prt_et"></span>
+  </div>
+
+  <div class="d-flex justify-content-end mb-3 text-center">
+    <div style="width: 300px;">
+      ลงชื่อ <span class="print-line" style="width: 170px;" id="prt_req_sign"></span> ผู้ขอใช้รถ<br>
+      (<span class="print-line" style="width: 170px;" id="prt_req_name"></span>)<br>
+      ตำแหน่ง <span class="print-line" style="width: 170px;" id="prt_req_pos"></span>
+    </div>
+  </div>
+
+  <hr style="border-top: 1px dashed #666; margin: 15px 0;">
+
+  <div>
+    เห็นควรอนุมัติให้ใช้รถยนต์ยี่ห้อ <span class="print-line" style="width: 200px;" id="prt_model"></span>
+    หมายเลขทะเบียน <span class="print-line" style="width: 210px;" id="prt_plate"></span>
+  </div>
+  <div class="mb-4">
+    โดยให้ <span class="print-line" style="width: 200px;" id="prt_driver"></span> เป็นผู้ขับ 
+    เติมน้ำมัน <span class="print-line" style="width: 80px;" id="prt_fuel"></span> ลิตร 
+    เป็นเงิน <span class="print-line" style="width: 90px;" id="prt_cost"></span> บาท
+  </div>
+
+  <div class="d-flex justify-content-end mb-4 text-center">
+    <div style="width: 350px;">
+      ลงชื่อ <span class="print-line" style="width: 180px;"></span> หัวหน้ากลุ่มงานบริหารทั่วไป<br>
+      (นางสาวชรินช์ทิพย์ ศรีนิล)
+    </div>
+  </div>
+
+  <div class="mb-2">
+    คำสั่ง &nbsp;&nbsp;[ &nbsp; ] อนุมัติ &nbsp;&nbsp;&nbsp;&nbsp; [ &nbsp; ] ไม่อนุมัติ
+  </div>
+
+  <div class="mb-4 text-center" style="width: 260px;">
+    ลงชื่อ <span class="print-line" style="width: 150px;"></span> ผู้อนุมัติ<br>
+    (นายจิรภัทร พุ่มฉายา)<br>
+    ผู้อำนวยการโรงพยาบาลไทรโยค<br>
+    วันที่ <span class="print-line" style="width: 150px;"></span>
+  </div>
+
+  <hr style="border-top: 1px solid #000; margin: 15px 0;">
+
+  <div class="fw-bold" style="text-decoration: underline;">รายงานของพนักงานขับรถยนต์</div>
+  <div>
+    ออกเดินทาง วันที่ <span class="print-line" style="width: 330px;" id="prt_asd"></span>
+    เวลา <span class="print-line" style="width: 170px;" id="prt_ast"></span>
+  </div>
+  <div>
+    กลับถึง &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;วันที่ <span class="print-line" style="width: 330px;" id="prt_aed"></span>
+    เวลา <span class="print-line" style="width: 170px;" id="prt_aet"></span>
+  </div>
+  <div>
+    สถานที่ไป <span class="print-line" style="width: 630px;" id="prt_aplace"></span>
+  </div>
+  <div>
+    เลขกิโลเมตรเมื่อออกเดินทาง <span class="print-line" style="width: 140px;" id="prt_skm"></span>
+    เลขกิโลเมตรเมื่อกลับถึง <span class="print-line" style="width: 140px;" id="prt_ekm"></span>
+    รวม <span class="print-line" style="width: 90px;" id="prt_dkm"></span> กม.
+  </div>
+  <div class="mb-4">
+    รถยนต์ยี่ห้อ <span class="print-line" style="width: 150px;" id="prt_amodel"></span>
+    หมายเลขทะเบียน <span class="print-line" style="width: 180px;" id="prt_aplate"></span>
+  </div>
+
+  <div class="d-flex justify-content-end text-center">
+    <div style="width: 300px;">
+      ลงชื่อ <span class="print-line" style="width: 170px;" id="prt_d_sign"></span> พนักงานขับรถยนต์<br>
+      (<span class="print-line" style="width: 170px;" id="prt_d_name"></span>)
+    </div>
+  </div>
+</div>
+
+<!-- ================= Vendor Scripts ================= -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- ================= App Modules ================= -->
+<script src="js/config.js"></script>
+<script src="js/signature.js"></script>
+<script src="js/calendar.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
