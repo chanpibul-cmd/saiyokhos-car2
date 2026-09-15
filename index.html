@@ -33,24 +33,29 @@
   <style>
 /**
  * ระบบบริหารจัดการยานพาหนะและรถพยาบาล - โรงพยาบาลไทรโยค (Car 2)
- * Modern Design System & Stylesheet
+ * Modern Design System: Light/Dark Theme & Full Multi-Device Responsiveness
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap');
 
-:root {
+/* ==========================================================================
+   Design Tokens & Themes (Light & Dark)
+   ========================================================================== */
+
+:root, [data-theme="light"] {
   --font-heading: 'Prompt', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-body: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  /* Primary Palette */
+  /* Primary Accent */
   --primary: #2563eb;
   --primary-hover: #1d4ed8;
   --primary-light: #eff6ff;
   --primary-border: #bfdbfe;
 
-  /* Neutral Palette */
+  /* Neutrals */
   --bg-app: #f8fafc;
   --bg-card: #ffffff;
+  --bg-card-subtle: #f8fafc;
   --text-main: #0f172a;
   --text-muted: #64748b;
   --text-light: #94a3b8;
@@ -67,19 +72,53 @@
   --status-cancelled-bg: #f1f5f9;
   --status-cancelled-text: #64748b;
 
-  /* Layout Dimensions */
+  /* UI Dimensions */
   --sidebar-width: 260px;
   --topbar-height: 68px;
   --bottom-nav-height: 64px;
 
-  /* Shadows */
+  /* Elevation */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
 }
 
-/* Base resets */
+[data-theme="dark"] {
+  /* Dark Mode Palette */
+  --primary: #3b82f6;
+  --primary-hover: #60a5fa;
+  --primary-light: rgba(59, 130, 246, 0.15);
+  --primary-border: #1d4ed8;
+
+  --bg-app: #090d16;
+  --bg-card: #131c2e;
+  --bg-card-subtle: #0f172a;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-light: #64748b;
+  --border-color: #1e293b;
+  --border-focus: #3b82f6;
+
+  --status-pending-bg: rgba(239, 68, 68, 0.2);
+  --status-pending-text: #fca5a5;
+  --status-assigned-bg: rgba(245, 158, 11, 0.2);
+  --status-assigned-text: #fcd34d;
+  --status-completed-bg: rgba(16, 185, 129, 0.2);
+  --status-completed-text: #6ee7b7;
+  --status-cancelled-bg: rgba(100, 116, 139, 0.2);
+  --status-cancelled-text: #cbd5e1;
+
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.55);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.65);
+}
+
+/* ==========================================================================
+   Base & Typography
+   ========================================================================== */
+
 * {
   box-sizing: border-box;
 }
@@ -92,6 +131,7 @@ body {
   padding: 0;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 h1, h2, h3, h4, h5, h6, .font-heading {
@@ -110,10 +150,10 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   position: relative;
 }
 
-/* Sidebar for Desktop */
+/* Desktop Sidebar */
 .app-sidebar {
   width: var(--sidebar-width);
-  background: #ffffff;
+  background: var(--bg-card);
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
@@ -122,7 +162,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   bottom: 0;
   left: 0;
   z-index: 1040;
-  transition: transform 0.25s ease-in-out;
+  transition: transform 0.25s ease-in-out, background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .sidebar-brand {
@@ -131,7 +171,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   align-items: center;
   gap: 12px;
   border-bottom: 1px solid var(--border-color);
-  background: #ffffff;
+  background: var(--bg-card);
 }
 
 .sidebar-brand img, .sidebar-brand .logo-icon {
@@ -145,13 +185,13 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   color: white;
   font-size: 22px;
   box-shadow: 0 4px 8px rgba(37, 99, 235, 0.25);
+  flex-shrink: 0;
 }
 
 .sidebar-brand-text h1 {
   font-size: 1.05rem;
   margin: 0;
   line-height: 1.25;
-  color: #1e293b;
 }
 
 .sidebar-brand-text small {
@@ -186,7 +226,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   gap: 12px;
   padding: 10px 14px;
   border-radius: 10px;
-  color: #475569;
+  color: var(--text-muted);
   font-weight: 500;
   font-size: 0.95rem;
   transition: all 0.2s ease;
@@ -197,12 +237,12 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 
 .sidebar-nav .nav-link i {
   font-size: 1.2rem;
-  color: #64748b;
+  color: var(--text-muted);
   transition: color 0.2s;
 }
 
 .sidebar-nav .nav-link:hover {
-  background-color: #f1f5f9;
+  background-color: var(--bg-card-subtle);
   color: var(--primary);
 }
 
@@ -252,7 +292,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 /* Topbar */
 .app-topbar {
   height: var(--topbar-height);
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-card);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-color);
@@ -263,6 +303,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .topbar-left {
@@ -274,7 +315,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 .topbar-right {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .btn-sidebar-toggle {
@@ -284,7 +325,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   border-radius: 8px;
   padding: 6px 10px;
   font-size: 1.25rem;
-  color: #334155;
+  color: var(--text-main);
   cursor: pointer;
 }
 
@@ -292,12 +333,12 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #f8fafc;
+  background: var(--bg-card-subtle);
   border: 1px solid var(--border-color);
   border-radius: 20px;
   padding: 6px 14px;
   font-size: 0.85rem;
-  color: #334155;
+  color: var(--text-main);
 }
 
 .clock-widget i {
@@ -317,12 +358,39 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   border: 1px solid #a7f3d0;
 }
 
+[data-theme="dark"] .sync-status-badge {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
 .sync-status-badge .dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background-color: #10b981;
   display: inline-block;
+}
+
+/* Theme Toggle Button */
+.btn-theme-toggle {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-main);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-theme-toggle:hover {
+  background: var(--border-color);
+  color: var(--primary);
 }
 
 /* Page Section View Container */
@@ -345,7 +413,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Page Header banner */
+/* Page Header */
 .page-header {
   margin-bottom: 24px;
 }
@@ -356,7 +424,6 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   gap: 12px;
   font-size: 1.45rem;
   font-weight: 600;
-  color: #1e293b;
   margin: 0 0 6px 0;
 }
 
@@ -371,13 +438,13 @@ h1, h2, h3, h4, h5, h6, .font-heading {
    ========================================================================== */
 
 .app-card {
-  background: #ffffff;
+  background: var(--bg-card);
   border-radius: 16px;
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
   padding: 24px;
   margin-bottom: 24px;
-  transition: box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease, background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .app-card:hover {
@@ -390,7 +457,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   justify-content: space-between;
   margin-bottom: 20px;
   padding-bottom: 14px;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .card-header-clean h3, .card-header-clean h4 {
@@ -403,7 +470,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 
 /* KPI Summary Cards */
 .kpi-card {
-  background: #ffffff;
+  background: var(--bg-card);
   border-radius: 16px;
   border: 1px solid var(--border-color);
   padding: 20px;
@@ -411,7 +478,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   align-items: center;
   gap: 16px;
   box-shadow: var(--shadow-sm);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.25s ease;
 }
 
 .kpi-card:hover {
@@ -430,10 +497,10 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   flex-shrink: 0;
 }
 
-.kpi-icon-primary { background: #eff6ff; color: #2563eb; }
-.kpi-icon-success { background: #ecfdf5; color: #059669; }
-.kpi-icon-amber   { background: #fffbeb; color: #d97706; }
-.kpi-icon-rose    { background: #fff1f2; color: #e11d48; }
+.kpi-icon-primary { background: var(--primary-light); color: var(--primary); }
+.kpi-icon-success { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.kpi-icon-amber   { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+.kpi-icon-rose    { background: rgba(225, 29, 72, 0.15); color: #e11d48; }
 
 .kpi-info h5 {
   font-size: 0.85rem;
@@ -447,7 +514,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   font-size: 1.5rem;
   font-weight: 700;
   font-family: var(--font-heading);
-  color: #1e293b;
+  color: var(--text-main);
   margin: 0;
   line-height: 1.2;
 }
@@ -457,7 +524,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   color: var(--text-light);
 }
 
-/* Form Styling */
+/* Form Controls */
 .form-section-title {
   font-size: 0.95rem;
   font-weight: 600;
@@ -473,29 +540,32 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 .form-label {
   font-weight: 500;
   font-size: 0.9rem;
-  color: #334155;
+  color: var(--text-main);
   margin-bottom: 6px;
 }
 
 .form-control, .form-select {
   border-radius: 10px;
   border: 1px solid var(--border-color);
+  background-color: var(--bg-card-subtle);
+  color: var(--text-main);
   padding: 10px 14px;
   font-family: var(--font-body);
   font-size: 0.95rem;
-  color: #1e293b;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s, background-color 0.25s ease;
 }
 
 .form-control:focus, .form-select:focus {
+  background-color: var(--bg-card);
   border-color: var(--border-focus);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  color: var(--text-main);
   outline: none;
 }
 
 .form-control[readonly] {
-  background-color: #f8fafc;
-  color: #475569;
+  background-color: var(--bg-card-subtle);
+  color: var(--text-muted);
 }
 
 /* Trip duration live badge */
@@ -503,9 +573,9 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #f0fdf4;
-  color: #15803d;
-  border: 1px solid #bbf7d0;
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
   border-radius: 8px;
   padding: 6px 12px;
   font-size: 0.85rem;
@@ -522,7 +592,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 }
 
 .usage-chip-btn {
-  background: #f8fafc;
+  background: var(--bg-card-subtle);
   border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 10px 12px;
@@ -533,12 +603,11 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   cursor: pointer;
   transition: all 0.15s ease;
   text-align: left;
-  color: #334155;
+  color: var(--text-main);
 }
 
 .usage-chip-btn:hover {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
+  background: var(--border-color);
 }
 
 .usage-chip-btn.selected {
@@ -566,45 +635,51 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 .badge-status-completed { background: var(--status-completed-bg); color: var(--status-completed-text); }
 .badge-status-cancelled { background: var(--status-cancelled-bg); color: var(--status-cancelled-text); }
 
-/* Table Enhancements */
+/* Table Styling */
 .table-responsive {
   border-radius: 12px;
   border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
   margin-bottom: 0;
   font-size: 0.92rem;
+  color: var(--text-main);
 }
 
 .table thead th {
-  background-color: #f8fafc;
-  color: #475569;
+  background-color: var(--bg-card-subtle);
+  color: var(--text-muted);
   font-family: var(--font-heading);
   font-weight: 600;
   border-bottom: 1px solid var(--border-color);
   padding: 12px 14px;
+  white-space: nowrap;
 }
 
 .table tbody td {
   padding: 12px 14px;
   vertical-align: middle;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+  color: var(--text-main);
 }
 
-.table tbody tr:hover {
-  background-color: #f8fafc;
+.table tbody tr:hover td {
+  background-color: var(--bg-card-subtle);
 }
 
 /* Odometer KM Display for Driver */
 .odometer-box {
-  background: #0f172a;
+  background: #090d16;
   border-radius: 14px;
   padding: 16px;
   color: #f8fafc;
   text-align: center;
   margin-bottom: 16px;
-  border: 1px solid #334155;
+  border: 1px solid var(--border-color);
 }
 
 .odometer-title {
@@ -615,7 +690,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 
 .odometer-num {
   font-family: 'Prompt', monospace;
-  font-size: 2.2rem;
+  font-size: clamp(1.6rem, 5vw, 2.2rem);
   font-weight: 700;
   letter-spacing: 2px;
   color: #38bdf8;
@@ -623,8 +698,8 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 
 /* Canvas signature styling */
 .sig-box-container {
-  background: #f8fafc;
-  border: 2px dashed #cbd5e1;
+  background: var(--bg-card-subtle);
+  border: 2px dashed var(--border-color);
   border-radius: 12px;
   padding: 8px;
   position: relative;
@@ -639,6 +714,10 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   cursor: crosshair;
   touch-action: none;
   display: block;
+}
+
+[data-theme="dark"] .sig-canvas {
+  background: #0f172a;
 }
 
 /* Fuel Tank Balance Card */
@@ -665,13 +744,13 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 
 .oil-balance-val {
   font-family: var(--font-heading);
-  font-size: 3.5rem;
+  font-size: clamp(2.4rem, 8vw, 3.5rem);
   font-weight: 700;
   margin: 10px 0;
   text-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
 
-/* Bottom Navigation Bar for Mobile */
+/* Bottom Navigation Bar */
 .bottom-nav {
   display: none;
   position: fixed;
@@ -679,10 +758,11 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   left: 0;
   right: 0;
   height: var(--bottom-nav-height);
-  background: #ffffff;
+  background: var(--bg-card);
   border-top: 1px solid var(--border-color);
   z-index: 1050;
   box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .bottom-nav-items {
@@ -705,7 +785,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #64748b;
+  color: var(--text-muted);
   text-decoration: none;
   font-size: 0.72rem;
   font-weight: 500;
@@ -724,10 +804,217 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   font-weight: 600;
 }
 
+/* Modals */
+.modal-content {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+
+.modal-header.bg-light, .modal-footer.bg-light {
+  background-color: var(--bg-card-subtle) !important;
+  border-color: var(--border-color);
+}
+
+/* DataTables pagination & filters in Dark Mode */
+[data-theme="dark"] .dataTables_wrapper .dataTables_length select,
+[data-theme="dark"] .dataTables_wrapper .dataTables_filter input {
+  background-color: var(--bg-card-subtle);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .page-item .page-link {
+  background-color: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .page-item.active .page-link {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+
+[data-theme="dark"] .dataTables_info {
+  color: var(--text-muted) !important;
+}
+
+/* Select2 in Dark Mode */
+[data-theme="dark"] .select2-container--bootstrap-5 .select2-selection {
+  background-color: var(--bg-card-subtle);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .select2-dropdown {
+  background-color: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .select2-container--bootstrap-5 .select2-search__field {
+  background-color: var(--bg-card-subtle);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+  background-color: var(--primary);
+  color: #ffffff;
+}
+
+[data-theme="dark"] .select2-container--bootstrap-5 .select2-results__option {
+  color: var(--text-main);
+}
+
+/* FullCalendar in Dark Mode */
+[data-theme="dark"] .fc-theme-standard td,
+[data-theme="dark"] .fc-theme-standard th {
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .fc-col-header-cell {
+  background-color: var(--bg-card-subtle);
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .fc-daygrid-day {
+  background-color: var(--bg-card);
+}
+
+[data-theme="dark"] .fc-button {
+  background-color: var(--bg-card-subtle) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .fc-button-active {
+  background-color: var(--primary) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .fc-list-day-cushion {
+  background-color: var(--bg-card-subtle) !important;
+}
+
+[data-theme="dark"] .fc-list-event:hover td {
+  background-color: var(--bg-card-subtle) !important;
+}
+
+[data-theme="dark"] .fc-theme-standard .fc-list {
+  border-color: var(--border-color);
+}
+
+/* SweetAlert2 in Dark Mode */
+[data-theme="dark"] .swal2-popup {
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .swal2-title,
+[data-theme="dark"] .swal2-html-container {
+  color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .swal2-input {
+  background-color: var(--bg-card-subtle) !important;
+  color: var(--text-main) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Dark Mode Bootstrap & Utility Overrides */
+[data-theme="dark"] .text-dark {
+  color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .bg-light {
+  background-color: var(--bg-card-subtle) !important;
+  color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .bg-white {
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .border,
+[data-theme="dark"] .border-top,
+[data-theme="dark"] .border-bottom,
+[data-theme="dark"] .border-start,
+[data-theme="dark"] .border-end {
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .card {
+  background-color: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .table {
+  color: var(--text-main);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .table-hover > tbody > tr:hover > * {
+  background-color: var(--bg-card-subtle) !important;
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+[data-theme="dark"] .text-muted {
+  color: var(--text-muted) !important;
+}
+
+
 /* ==========================================================================
-   Responsive Adaptations
+   Multi-Device Responsive Breakpoints: Desktop, Tablet, Mobile
    ========================================================================== */
 
+/* Tablet (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  :root {
+    --sidebar-width: 230px;
+  }
+
+  .content-wrapper {
+    padding: 20px;
+  }
+
+  .app-card {
+    padding: 20px;
+  }
+
+  .kpi-card {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .kpi-icon-box {
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+  }
+
+  .kpi-info .kpi-value {
+    font-size: 1.3rem;
+  }
+
+  .usage-chips-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Mobile & Small Tablet (< 992px) */
 @media (max-width: 992px) {
   .app-sidebar {
     transform: translateX(-100%);
@@ -755,35 +1042,121 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     padding: 16px;
   }
 
-  .oil-balance-val {
-    font-size: 2.8rem;
+  .sidebar-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 1035;
+  }
+
+  .sidebar-backdrop.show {
+    display: block;
   }
 }
 
-/* Sidebar Backdrop on Mobile */
-.sidebar-backdrop {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(2px);
-  z-index: 1035;
+/* Mobile (< 768px) */
+@media (max-width: 767px) {
+  .app-topbar {
+    padding: 0 14px;
+    height: 60px;
+  }
+
+  .content-wrapper {
+    padding: 12px 10px;
+  }
+
+  .app-card {
+    padding: 16px 12px;
+    border-radius: 12px;
+  }
+
+  .page-header-title {
+    font-size: 1.2rem;
+  }
+
+  .page-header-subtitle {
+    font-size: 0.82rem;
+  }
+
+  .kpi-card {
+    padding: 14px 12px;
+    gap: 10px;
+  }
+
+  .kpi-icon-box {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    border-radius: 10px;
+  }
+
+  .kpi-info h5 {
+    font-size: 0.78rem;
+  }
+
+  .kpi-info .kpi-value {
+    font-size: 1.25rem;
+  }
+
+  .usage-chips-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .usage-chip-btn {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+
+  .fc .fc-toolbar {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 1.15rem;
+  }
+
+  .modal-dialog {
+    margin: 10px;
+  }
+
+  .modal-body {
+    padding: 16px !important;
+  }
 }
 
-.sidebar-backdrop.show {
-  display: block;
+/* Extra Small Mobile (< 420px) */
+@media (max-width: 420px) {
+  .usage-chips-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar-right .btn-theme-toggle {
+    width: 32px;
+    height: 32px;
+    font-size: 0.95rem;
+  }
+
+  .topbar-right .sync-status-badge {
+    display: none;
+  }
 }
 
 /* ==========================================================================
    Official A4 Print Template for Sai Yok Hospital
+   (Stays strict black & white on A4 even in Dark Mode)
    ========================================================================== */
 
 #printTemplate {
   display: none;
-  background: white;
+  background: #ffffff !important;
+  color: #000000 !important;
   padding: 15mm 20mm;
 }
 
@@ -814,8 +1187,8 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     font-family: 'Sarabun', sans-serif !important;
     font-size: 15px !important;
     line-height: 1.8 !important;
-    color: #000 !important;
-    background: transparent !important;
+    color: #000000 !important;
+    background: #ffffff !important;
     box-shadow: none !important;
   }
 
@@ -897,8 +1270,13 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     </div>
 
     <div class="sidebar-footer">
-      <span>v2.0 Modern Car</span>
-      <span class="text-muted"><i class="bi bi-shield-check text-success"></i> Online</span>
+      <div>
+        <span>v2.0 Modern Car</span>
+        <span class="text-muted ms-2"><i class="bi bi-shield-check text-success"></i> Online</span>
+      </div>
+      <button class="btn btn-sm btn-link text-decoration-none p-0 text-muted" onclick="toggleTheme()" title="สลับโหมดมืด/สว่าง">
+        <span id="themeToggleLabel" class="small">โหมดมืด</span>
+      </button>
     </div>
   </aside>
 
@@ -923,6 +1301,9 @@ h1, h2, h3, h4, h5, h6, .font-heading {
         <div id="syncStatusBadge" class="sync-status-badge">
           <span class="dot"></span> เชื่อมต่อฐานข้อมูล
         </div>
+        <button class="btn-theme-toggle" onclick="toggleTheme()" id="btnThemeToggle" title="สลับโหมดมืด/สว่าง" aria-label="Toggle dark mode">
+          <i class="bi bi-moon-stars-fill text-primary" id="themeToggleIcon"></i>
+        </button>
         <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="loadData(false)" title="ดึงข้อมูลล่าสุด">
           <i class="bi bi-arrow-clockwise me-1"></i> รีเฟรช
         </button>
@@ -1876,7 +2257,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
  */
 
 const CONFIG = {
-  // URL Web App จาก Google Apps Script (เดิมจากโปรเจค car)
+  // URL Web App จาก Google Apps Script (อัปเดตใหม่)
   WEB_APP_URL: 'https://script.google.com/macros/s/AKfycbx1fZOtla0uI_Y2b0bGmxo3orWV7KPCmH8PRjZwxHlEywwPbg9MRy7gd_jc8FP0EDFSNg/exec',
 
   // ข้อมูลหน่วยงาน
@@ -1990,7 +2371,8 @@ class DigitalSignature {
     this.ctx.lineWidth = 2.5;
     this.ctx.lineCap = 'round';
     this.ctx.lineJoin = 'round';
-    this.ctx.strokeStyle = '#1e293b';
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.ctx.strokeStyle = isDark ? '#38bdf8' : '#1e293b';
 
     // Restore if was drawn
     if (prevData) {
@@ -2261,13 +2643,14 @@ window.carCalendar = {
 /**
  * โมดูลแดชบอร์ดและการวิเคราะห์ข้อมูล (Analytics Dashboard Module)
  * คำนวณ KPI Cards และเรนเดอร์กราฟสถิติด้วย Chart.js
+ * รองรับการปรับโทนสีอัตโนมัติตามโหมดมืด (Dark Mode) และโหมดสว่าง (Light Mode)
  */
 
 class CarDashboard {
   constructor() {
     this.charts = {};
     this.globalData = [];
-    this.currentFilterType = 'all';
+    this.currentFilterType = 'fy';
   }
 
   init(globalData) {
@@ -2280,6 +2663,17 @@ class CarDashboard {
     this.globalData = globalData || [];
     this.initFiscalYearOptions();
     this.update();
+  }
+
+  getThemeColors() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    return {
+      isDark: isDark,
+      gridColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9',
+      tickColor: isDark ? '#94a3b8' : '#475569',
+      tooltipBg: isDark ? '#0f172a' : '#1e293b',
+      doughnutBorder: isDark ? '#131c2e' : '#ffffff'
+    };
   }
 
   initFiscalYearOptions() {
@@ -2395,11 +2789,8 @@ class CarDashboard {
       if (!isNaN(fuelBaht) && fuelBaht > 0) totalFuelCost += fuelBaht;
     });
 
-    // คำนวณค่าเฉลี่ย
     const avgKmPerTrip = completedTrips > 0 ? (totalKm / completedTrips).toFixed(1) : '0';
-    const avgFuelCost = totalKm > 0 && totalFuelCost > 0 ? (totalFuelCost / totalKm).toFixed(2) : '0';
 
-    // อัปเดตการ์ด KPI บนหน้าเว็บ
     const setElem = (id, text) => {
       const el = document.getElementById(id);
       if (el) el.textContent = text;
@@ -2429,7 +2820,6 @@ class CarDashboard {
       let en = new Date(r[16] || r[5]);
       if (isNaN(en)) en = st;
 
-      // นับรายวัน
       let current = new Date(st);
       current.setHours(0, 0, 0, 0);
       const endDay = new Date(en);
@@ -2447,7 +2837,6 @@ class CarDashboard {
       }
       if (daysCount === 0) daysCount = 1;
 
-      // รถยนต์
       const plate = r[13];
       if (plate && plate.trim() !== '') {
         carCounts[plate] = (carCounts[plate] || 0) + daysCount;
@@ -2459,18 +2848,15 @@ class CarDashboard {
         if (!isNaN(kmEn) && kmEn > carKMs[plate].max) carKMs[plate].max = kmEn;
       }
 
-      // พขร.
       const driver = r[12];
       if (driver && driver.trim() !== '') {
         driverCounts[driver] = (driverCounts[driver] || 0) + daysCount;
       }
 
-      // ประเภทการใช้รถ
       const cType = r[11] || 'ไม่ระบุ';
       typeCounts[cType] = (typeCounts[cType] || 0) + 1;
     });
 
-    // คำนวณระยะทางรวมแต่ละคัน
     const carKmLabels = [];
     const carKmData = [];
     for (let p in carKMs) {
@@ -2483,13 +2869,13 @@ class CarDashboard {
       }
     }
 
-    // 1. กราฟเส้นจำนวนการใช้รถรายวัน
+    // 1. กราฟเส้นความถี่รายวัน
     this.createLineChart(
       'chartDaily',
       'จำนวนการใช้รถ (ครั้ง/วัน)',
       Object.keys(dailyCounts),
       Object.values(dailyCounts),
-      '#2563eb'
+      '#3b82f6'
     );
 
     // 2. กราฟแท่งจำนวนครั้งแต่ละคัน
@@ -2498,7 +2884,7 @@ class CarDashboard {
       'จำนวนครั้งที่ใช้รถแต่ละคัน (วัน)',
       Object.keys(carCounts),
       Object.values(carCounts),
-      '#059669',
+      '#10b981',
       true
     );
 
@@ -2508,7 +2894,7 @@ class CarDashboard {
       'จำนวนภารกิจของ พขร. (วัน)',
       Object.keys(driverCounts),
       Object.values(driverCounts),
-      '#d97706',
+      '#f59e0b',
       true
     );
 
@@ -2536,10 +2922,11 @@ class CarDashboard {
     if (!el) return;
     if (this.charts[canvasId]) this.charts[canvasId].destroy();
 
+    const tc = this.getThemeColors();
     const ctx = el.getContext('2d');
     const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-    gradient.addColorStop(0, 'rgba(37, 99, 235, 0.35)');
-    gradient.addColorStop(1, 'rgba(37, 99, 235, 0.0)');
+    gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+    gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
 
     this.charts[canvasId] = new Chart(ctx, {
       type: 'line',
@@ -2564,7 +2951,7 @@ class CarDashboard {
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: '#1e293b',
+            backgroundColor: tc.tooltipBg,
             titleFont: { family: 'Prompt' },
             bodyFont: { family: 'Sarabun' },
             padding: 10,
@@ -2572,8 +2959,8 @@ class CarDashboard {
           }
         },
         scales: {
-          x: { grid: { display: false }, ticks: { font: { family: 'Sarabun' } } },
-          y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1, font: { family: 'Prompt' } } }
+          x: { grid: { display: false }, ticks: { color: tc.tickColor, font: { family: 'Sarabun' } } },
+          y: { beginAtZero: true, grid: { color: tc.gridColor }, ticks: { color: tc.tickColor, stepSize: 1, font: { family: 'Prompt' } } }
         }
       }
     });
@@ -2584,6 +2971,7 @@ class CarDashboard {
     if (!el) return;
     if (this.charts[canvasId]) this.charts[canvasId].destroy();
 
+    const tc = this.getThemeColors();
     const ctx = el.getContext('2d');
     this.charts[canvasId] = new Chart(ctx, {
       type: 'bar',
@@ -2604,7 +2992,7 @@ class CarDashboard {
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: '#1e293b',
+            backgroundColor: tc.tooltipBg,
             titleFont: { family: 'Prompt' },
             bodyFont: { family: 'Sarabun' },
             padding: 10,
@@ -2612,8 +3000,8 @@ class CarDashboard {
           }
         },
         scales: {
-          x: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Sarabun' } } },
-          y: { beginAtZero: true, grid: { display: false }, ticks: { font: { family: 'Sarabun' } } }
+          x: { beginAtZero: true, grid: { color: tc.gridColor }, ticks: { color: tc.tickColor, font: { family: 'Sarabun' } } },
+          y: { beginAtZero: true, grid: { display: false }, ticks: { color: tc.tickColor, font: { family: 'Sarabun' } } }
         }
       }
     });
@@ -2624,9 +3012,10 @@ class CarDashboard {
     if (!el) return;
     if (this.charts[canvasId]) this.charts[canvasId].destroy();
 
+    const tc = this.getThemeColors();
     const palette = [
-      '#2563eb', '#059669', '#d97706', '#dc2626', '#7c3aed',
-      '#0891b2', '#4f46e5', '#ca8a04', '#db2777', '#64748b', '#0d9488'
+      '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
+      '#06b6d4', '#6366f1', '#eab308', '#ec4899', '#64748b', '#14b8a6'
     ];
 
     const ctx = el.getContext('2d');
@@ -2639,7 +3028,7 @@ class CarDashboard {
           data: data,
           backgroundColor: palette.slice(0, labels.length),
           borderWidth: 2,
-          borderColor: '#ffffff'
+          borderColor: tc.doughnutBorder
         }]
       },
       options: {
@@ -2648,10 +3037,10 @@ class CarDashboard {
         plugins: {
           legend: {
             position: 'bottom',
-            labels: { font: { family: 'Sarabun', size: 12 }, boxWidth: 12 }
+            labels: { color: tc.tickColor, font: { family: 'Sarabun', size: 12 }, boxWidth: 12 }
           },
           tooltip: {
-            backgroundColor: '#1e293b',
+            backgroundColor: tc.tooltipBg,
             titleFont: { family: 'Prompt' },
             bodyFont: { family: 'Sarabun' },
             padding: 10,
@@ -3927,16 +4316,79 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('modalOilApprove')?.addEventListener('shown.bs.modal', () => sigPad2?.resize());
 
   // Setup modules
+  initTheme();
   setupRequestForm();
   setupAssignForm();
   setupDriverForm();
   setupOilModule();
   startRealtimeClock();
 
+  // Resize & orientation listeners
+  window.addEventListener('resize', () => {
+    if (sigPad1) sigPad1.resize();
+    if (sigPad2) sigPad2.resize();
+  });
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      if (sigPad1) sigPad1.resize();
+      if (sigPad2) sigPad2.resize();
+      if (typeof renderCalendar === 'function' && document.getElementById('page-calendar')?.classList.contains('active')) {
+        renderCalendar();
+      }
+    }, 150);
+  });
+
   // Load Data
   loadOptions();
   loadData(true);
 });
+
+/* ==========================================================================
+   13. Theme Management (โหมดมืด / โหมดสว่าง)
+   ========================================================================== */
+
+function initTheme() {
+  const savedTheme = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const initialTheme = savedTheme ? savedTheme : (prefersDark ? 'dark' : 'light');
+
+  setTheme(initialTheme);
+}
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+
+  const iconEl = document.getElementById('themeToggleIcon');
+  const labelEl = document.getElementById('themeToggleLabel');
+
+  if (theme === 'dark') {
+    if (iconEl) iconEl.className = 'bi bi-sun-fill text-warning';
+    if (labelEl) labelEl.textContent = 'โหมดสว่าง';
+  } else {
+    if (iconEl) iconEl.className = 'bi bi-moon-stars-fill text-primary';
+    if (labelEl) labelEl.textContent = 'โหมดมืด';
+  }
+
+  // อัปเดตกราฟสถิติตามโทนสีของธีม
+  if (carDashboard && document.getElementById('page-dashboard')?.classList.contains('active')) {
+    carDashboard.update();
+  }
+
+  // อัปเดตปฏิทินตามธีม
+  if (typeof renderCalendar === 'function' && document.getElementById('page-calendar')?.classList.contains('active')) {
+    renderCalendar();
+  }
+}
+
+function toggleTheme() {
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  setTheme(newTheme);
+}
+
+window.toggleTheme = toggleTheme;
+window.setTheme = setTheme;
 
 
 </script>
