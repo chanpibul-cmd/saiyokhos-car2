@@ -123,13 +123,16 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
   font-family: var(--font-body);
   background-color: var(--bg-app);
   color: var(--text-main);
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  max-width: 100vw;
+  overflow-x: hidden;
+  position: relative;
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.25s ease, color 0.25s ease;
 }
@@ -148,6 +151,8 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   display: flex;
   min-height: 100vh;
   position: relative;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* Desktop Sidebar */
@@ -284,6 +289,9 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   flex: 1;
   margin-left: var(--sidebar-width);
   min-height: 100vh;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   transition: margin-left 0.25s ease-in-out;
@@ -397,11 +405,16 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 .content-wrapper {
   padding: 24px;
   flex: 1;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 .page-section {
   display: none;
   animation: fadeIn 0.2s ease-in-out;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .page-section.active {
@@ -444,6 +457,9 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   box-shadow: var(--shadow-sm);
   padding: 24px;
   margin-bottom: 24px;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
   transition: box-shadow 0.2s ease, background-color 0.25s ease, border-color 0.25s ease;
 }
 
@@ -641,12 +657,17 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   border: 1px solid var(--border-color);
   background: var(--bg-card);
   -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  width: 100%;
+  overflow-x: auto;
+  position: relative;
 }
 
 .table {
   margin-bottom: 0;
   font-size: 0.92rem;
   color: var(--text-main);
+  width: 100% !important;
 }
 
 .table thead th {
@@ -665,10 +686,124 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   border-bottom: 1px solid var(--border-color);
   background-color: var(--bg-card);
   color: var(--text-main);
+  white-space: nowrap;
 }
 
 .table tbody tr:hover td {
   background-color: var(--bg-card-subtle);
+}
+
+/* Sticky Action Column */
+.table th:first-child,
+.table td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background-color: var(--bg-card);
+  box-shadow: 2px 0 6px -2px rgba(0, 0, 0, 0.12);
+}
+
+.table thead th:first-child {
+  background-color: var(--bg-card-subtle);
+  z-index: 4;
+}
+
+[data-theme="dark"] .table th:first-child,
+[data-theme="dark"] .table td:first-child {
+  background-color: var(--bg-card);
+  box-shadow: 2px 0 6px -2px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .table thead th:first-child {
+  background-color: var(--bg-card-subtle);
+}
+
+/* ==========================================================================
+   Mobile Record Cards & Responsive Data Display
+   ========================================================================== */
+
+.mobile-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-record-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.mobile-record-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-border);
+}
+
+.mobile-record-card .card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--border-color);
+  gap: 8px;
+}
+
+.mobile-record-card .card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.mobile-record-card .detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.45;
+}
+
+.mobile-record-card .detail-item i {
+  font-size: 1.05rem;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.mobile-record-card .detail-label {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  margin-right: 4px;
+}
+
+.mobile-record-card .detail-val {
+  color: var(--text-main);
+  word-break: break-word;
+}
+
+.mobile-record-card .card-action {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.empty-records-card {
+  text-align: center;
+  padding: 36px 20px;
+  background: var(--bg-card-subtle);
+  border: 1px dashed var(--border-color);
+  border-radius: 14px;
+  color: var(--text-muted);
+}
+
+.empty-records-card i {
+  font-size: 2.5rem;
+  opacity: 0.5;
+  display: block;
+  margin-bottom: 8px;
 }
 
 /* Odometer KM Display for Driver */
@@ -1129,6 +1264,62 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   .modal-body {
     padding: 16px !important;
   }
+
+  /* DataTables Responsive Controls on Mobile */
+  .dataTables_wrapper .row:first-child,
+  .dataTables_wrapper .row:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0 0 14px 0;
+  }
+
+  .dataTables_wrapper .dataTables_length,
+  .dataTables_wrapper .dataTables_filter,
+  .dataTables_wrapper .dataTables_info,
+  .dataTables_wrapper .dataTables_paginate {
+    width: 100% !important;
+    text-align: left !important;
+    padding: 0 !important;
+  }
+
+  .dataTables_wrapper .dataTables_filter {
+    margin-top: 4px;
+  }
+
+  .dataTables_wrapper .dataTables_filter label {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .dataTables_wrapper .dataTables_filter input {
+    width: 100% !important;
+    margin-left: 0 !important;
+    display: block;
+    height: 38px;
+    border-radius: 8px;
+  }
+
+  .dataTables_wrapper .dataTables_paginate {
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+    padding: 8px 0 !important;
+  }
+
+  .dataTables_wrapper .dataTables_paginate .pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 3px;
+    margin: 0;
+  }
+
+  .dataTables_wrapper .dataTables_paginate .page-link {
+    padding: 6px 10px;
+    font-size: 0.82rem;
+  }
 }
 
 /* Extra Small Mobile (< 420px) */
@@ -1479,16 +1670,40 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 
       <!-- ================= 3. หน้าจัดรถ ================= -->
       <section id="page-assign" class="page-section">
-        <div class="page-header">
-          <h2 class="page-header-title"><i class="bi bi-key text-primary"></i> จัดการจัดรถยนต์และคนขับ</h2>
-          <p class="page-header-subtitle">กำหนดพนักงานขับรถและทะเบียนรถสำหรับรายการคำขอที่ส่งเข้ามา</p>
+        <div class="page-header d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div>
+            <h2 class="page-header-title"><i class="bi bi-key text-primary"></i> จัดการจัดรถยนต์และคนขับ</h2>
+            <p class="page-header-subtitle">กำหนดพนักงานขับรถและทะเบียนรถสำหรับรายการคำขอที่ส่งเข้ามา</p>
+          </div>
+          <!-- View Switcher -->
+          <div class="btn-group btn-group-sm rounded-pill p-1 bg-card border shadow-sm" role="group">
+            <button type="button" class="btn btn-sm btn-primary rounded-pill px-3" id="btnViewCards_assign" onclick="switchTableViewMode('assign', 'cards')">
+              <i class="bi bi-grid-fill me-1"></i> การ์ด
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary border-0 rounded-pill px-3" id="btnViewTable_assign" onclick="switchTableViewMode('assign', 'table')">
+              <i class="bi bi-table me-1"></i> ตาราง
+            </button>
+          </div>
         </div>
 
         <div class="app-card">
-          <div class="card-header-clean">
+          <div class="card-header-clean flex-wrap gap-2">
             <h3><i class="bi bi-list-check me-2 text-primary"></i>รายการคำขอจัดรถ</h3>
+            <div id="cardSearch_assign" class="flex-grow-1" style="max-width: 320px;">
+              <div class="input-group input-group-sm">
+                <span class="input-group-text bg-card-subtle border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" id="cardSearchInput_assign" class="form-control border-start-0" placeholder="ค้นหาคำขอ..." onkeyup="filterCards('cardsAssign', this.value)">
+              </div>
+            </div>
           </div>
-          <div class="table-responsive">
+
+          <!-- 1. Mobile Cards View Container -->
+          <div id="containerCards_assign" class="mobile-cards-container">
+            <div id="cardsAssign" class="d-flex flex-column gap-3"></div>
+          </div>
+
+          <!-- 2. Table View Container -->
+          <div id="containerTable_assign" class="table-responsive" style="display: none;">
             <table id="tableAssign" class="table table-hover w-100 align-middle">
               <thead>
                 <tr>
@@ -1510,23 +1725,48 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 
       <!-- ================= 4. หน้ารายงาน พขร. ================= -->
       <section id="page-driver" class="page-section">
-        <div class="page-header">
-          <h2 class="page-header-title"><i class="bi bi-person-badge text-primary"></i> รายงานบันทึกการขับรถ (พขร.)</h2>
-          <p class="page-header-subtitle">สำหรับพนักงานขับรถบันทึกเวลาปฏิบัติงานจริง เลขไมล์กิโลเมตร และค่าน้ำมัน</p>
+        <div class="page-header d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div>
+            <h2 class="page-header-title"><i class="bi bi-person-badge text-primary"></i> รายงานบันทึกการขับรถ (พขร.)</h2>
+            <p class="page-header-subtitle">สำหรับพนักงานขับรถบันทึกเวลาปฏิบัติงานจริง เลขไมล์กิโลเมตร และค่าน้ำมัน</p>
+          </div>
+          <!-- View Switcher -->
+          <div class="btn-group btn-group-sm rounded-pill p-1 bg-card border shadow-sm" role="group">
+            <button type="button" class="btn btn-sm btn-primary rounded-pill px-3" id="btnViewCards_driver" onclick="switchTableViewMode('driver', 'cards')">
+              <i class="bi bi-grid-fill me-1"></i> การ์ด
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary border-0 rounded-pill px-3" id="btnViewTable_driver" onclick="switchTableViewMode('driver', 'table')">
+              <i class="bi bi-table me-1"></i> ตาราง
+            </button>
+          </div>
         </div>
 
         <div class="app-card">
           <div class="card-header-clean flex-wrap gap-2">
             <h3><i class="bi bi-speedometer me-2 text-primary"></i>ภารกิจที่ได้รับมอบหมาย</h3>
-            <div class="d-flex align-items-center gap-2">
-              <label for="filterDriver" class="small text-muted text-nowrap">กรองคนขับ:</label>
-              <select id="filterDriver" class="form-select form-select-sm" style="min-width: 200px;">
-                <option value="">-- กรองผู้ขับรถทั้งหมด --</option>
-              </select>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <div id="cardSearch_driver" style="min-width: 180px;">
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text bg-card-subtle border-end-0"><i class="bi bi-search text-muted"></i></span>
+                  <input type="text" id="cardSearchInput_driver" class="form-control border-start-0" placeholder="ค้นหาภารกิจ..." onkeyup="applyDriverCardsFilter()">
+                </div>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <label for="filterDriver" class="small text-muted text-nowrap">กรองคนขับ:</label>
+                <select id="filterDriver" class="form-select form-select-sm" style="min-width: 180px;">
+                  <option value="">-- กรองผู้ขับรถทั้งหมด --</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          <div class="table-responsive">
+          <!-- 1. Mobile Cards View Container -->
+          <div id="containerCards_driver" class="mobile-cards-container">
+            <div id="cardsDriver" class="d-flex flex-column gap-3"></div>
+          </div>
+
+          <!-- 2. Table View Container -->
+          <div id="containerTable_driver" class="table-responsive" style="display: none;">
             <table id="tableDriver" class="table table-hover w-100 align-middle">
               <thead>
                 <tr>
@@ -1548,16 +1788,45 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 
       <!-- ================= 5. หน้าประวัติทั้งหมดและพิมพ์ ================= -->
       <section id="page-report" class="page-section">
-        <div class="page-header">
-          <h2 class="page-header-title"><i class="bi bi-clock-history text-primary"></i> ประวัติการใช้รถและพิมพ์เอกสาร</h2>
-          <p class="page-header-subtitle">ค้นหาประวัติย้อนหลัง ตรวจสอบรายละเอียด และสั่งพิมพ์เอกสารขอใช้รถมาตรฐาน A4</p>
+        <div class="page-header d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div>
+            <h2 class="page-header-title"><i class="bi bi-clock-history text-primary"></i> ประวัติการใช้รถและพิมพ์เอกสาร</h2>
+            <p class="page-header-subtitle">ค้นหาประวัติย้อนหลัง ตรวจสอบรายละเอียด และสั่งพิมพ์เอกสารขอใช้รถมาตรฐาน A4</p>
+          </div>
+          <!-- View Switcher -->
+          <div class="btn-group btn-group-sm rounded-pill p-1 bg-card border shadow-sm" role="group">
+            <button type="button" class="btn btn-sm btn-primary rounded-pill px-3" id="btnViewCards_report" onclick="switchTableViewMode('report', 'cards')">
+              <i class="bi bi-grid-fill me-1"></i> การ์ด
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary border-0 rounded-pill px-3" id="btnViewTable_report" onclick="switchTableViewMode('report', 'table')">
+              <i class="bi bi-table me-1"></i> ตาราง
+            </button>
+          </div>
         </div>
 
         <div class="app-card">
-          <div class="card-header-clean">
+          <div class="card-header-clean flex-wrap gap-2">
             <h3><i class="bi bi-journal-text me-2 text-primary"></i>ประวัติการใช้รถทั้งหมด</h3>
+            <div id="cardSearch_report" class="flex-grow-1" style="max-width: 320px;">
+              <div class="input-group input-group-sm">
+                <span class="input-group-text bg-card-subtle border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" id="cardSearchInput_report" class="form-control border-start-0" placeholder="ค้นหาประวัติ..." onkeyup="applyReportCardsFilter()">
+              </div>
+            </div>
           </div>
-          <div class="table-responsive">
+
+          <!-- 1. Mobile Cards View Container -->
+          <div id="containerCards_report" class="mobile-cards-container">
+            <div id="cardsReport" class="d-flex flex-column gap-3"></div>
+            <div id="cardsReportPagination" class="text-center mt-3" style="display:none;">
+              <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-4" onclick="loadMoreReportCards()">
+                <i class="bi bi-arrow-down-circle me-1"></i> โหลดรายการเพิ่มเติม (+15)
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. Table View Container -->
+          <div id="containerTable_report" class="table-responsive" style="display: none;">
             <table id="tableReport" class="table table-hover w-100 align-middle">
               <thead>
                 <tr>
@@ -3364,10 +3633,362 @@ function formatDateUI(dStr) {
   });
 }
 
+/* ==========================================================================
+   4. Table Rendering & Mobile Cards Management
+   ========================================================================== */
+
+const tableViewModes = {
+  assign: window.innerWidth < 768 ? 'cards' : 'table',
+  driver: window.innerWidth < 768 ? 'cards' : 'table',
+  report: window.innerWidth < 768 ? 'cards' : 'table'
+};
+
+let currentDriverCardsData = [];
+let currentReportCardsData = [];
+let reportCardsLimit = 15;
+
+function switchTableViewMode(pageKey, mode) {
+  tableViewModes[pageKey] = mode;
+  const cardsCont = document.getElementById(`containerCards_${pageKey}`);
+  const tableCont = document.getElementById(`containerTable_${pageKey}`);
+  const btnCards = document.getElementById(`btnViewCards_${pageKey}`);
+  const btnTable = document.getElementById(`btnViewTable_${pageKey}`);
+  const searchBox = document.getElementById(`cardSearch_${pageKey}`);
+
+  if (mode === 'cards') {
+    if (cardsCont) cardsCont.style.display = 'block';
+    if (tableCont) tableCont.style.display = 'none';
+    if (searchBox) searchBox.style.display = 'block';
+    if (btnCards) {
+      btnCards.className = 'btn btn-sm btn-primary rounded-pill px-3';
+    }
+    if (btnTable) {
+      btnTable.className = 'btn btn-sm btn-outline-secondary border-0 rounded-pill px-3';
+    }
+  } else {
+    if (cardsCont) cardsCont.style.display = 'none';
+    if (tableCont) tableCont.style.display = 'block';
+    if (searchBox) searchBox.style.display = 'none';
+    if (btnCards) {
+      btnCards.className = 'btn btn-sm btn-outline-secondary border-0 rounded-pill px-3';
+    }
+    if (btnTable) {
+      btnTable.className = 'btn btn-sm btn-primary rounded-pill px-3';
+    }
+
+    setTimeout(() => {
+      if ($.fn.DataTable) {
+        $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust().responsive.recalc();
+      }
+    }, 60);
+  }
+}
+
+function initTableViewModes() {
+  const isMobile = window.innerWidth < 768;
+  const defaultMode = isMobile ? 'cards' : 'table';
+  switchTableViewMode('assign', tableViewModes.assign || defaultMode);
+  switchTableViewMode('driver', tableViewModes.driver || defaultMode);
+  switchTableViewMode('report', tableViewModes.report || defaultMode);
+}
+
+function filterCards(containerId, query) {
+  const q = (query || '').toLowerCase().trim();
+  const cards = document.querySelectorAll(`#${containerId} .mobile-record-card`);
+  cards.forEach(card => {
+    const text = card.textContent.toLowerCase();
+    card.style.display = text.includes(q) ? 'block' : 'none';
+  });
+}
+
+function renderMobileAssignCards(items) {
+  const container = document.getElementById('cardsAssign');
+  if (!container) return;
+
+  if (!items || items.length === 0) {
+    container.innerHTML = `
+      <div class="empty-records-card">
+        <i class="bi bi-inbox"></i>
+        <div class="fw-medium">ไม่มีรายการรอจัดรถในขณะนี้</div>
+        <small class="text-muted">รายการคำขอที่รอการจัดรถจะแสดงที่นี่</small>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = items.map(item => `
+    <div class="mobile-record-card">
+      <div class="card-top">
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-bold font-heading">#${item.id}</span>
+          <span class="badge bg-light text-dark border">${item.cType}</span>
+        </div>
+        <span class="badge-status ${item.badgeClass}">${item.status}</span>
+      </div>
+      
+      <div class="card-details">
+        <div class="detail-item">
+          <i class="bi bi-clock-history text-primary"></i>
+          <div>
+            <span class="detail-label">เวลาเดินทาง:</span>
+            <span class="detail-val fw-medium">${item.start} <span class="text-danger">ถึง ${item.end}</span></span>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="bi bi-person text-primary"></i>
+          <div>
+            <span class="detail-label">ผู้ขอใช้รถ:</span>
+            <span class="detail-val fw-semibold">${item.req}</span>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="bi bi-geo-alt text-danger"></i>
+          <div>
+            <span class="detail-label">สถานที่:</span>
+            <span class="detail-val">${item.place}</span>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="bi bi-card-text text-muted"></i>
+          <div>
+            <span class="detail-label">เรื่อง:</span>
+            <span class="detail-val text-muted">${item.subj}</span>
+          </div>
+        </div>
+        ${item.isAssigned ? `
+        <div class="detail-item bg-light p-2 rounded-3 mt-1">
+          <i class="bi bi-check-circle-fill text-success"></i>
+          <div>
+            <span class="detail-label">รถ/พขร.:</span>
+            <span class="detail-val fw-bold text-success">${item.plate || '-'} / ${item.driver}</span>
+          </div>
+        </div>` : ''}
+      </div>
+
+      <div class="card-action">
+        ${!item.isAssigned 
+          ? `<button class="btn btn-primary w-100 rounded-pill py-2 font-heading shadow-sm" onclick="openAssign('${item.id}')">
+               <i class="bi bi-key me-1"></i> จัดรถ / มอบหมายงาน
+             </button>`
+          : `<button class="btn btn-outline-success w-100 rounded-pill py-2 font-heading" onclick="openAssign('${item.id}')">
+               <i class="bi bi-pencil me-1"></i> แก้ไขจัดรถ (${item.plate || item.driver})
+             </button>`
+        }
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderMobileDriverCards(items) {
+  currentDriverCardsData = items || [];
+  applyDriverCardsFilter();
+}
+
+function applyDriverCardsFilter() {
+  const container = document.getElementById('cardsDriver');
+  if (!container) return;
+
+  const selectedDriver = ($('#filterDriver').val() || '').trim();
+  const searchEl = document.getElementById('cardSearchInput_driver');
+  const searchQuery = (searchEl?.value || '').toLowerCase().trim();
+
+  let filtered = currentDriverCardsData;
+  if (selectedDriver) {
+    filtered = filtered.filter(item => item.driver && item.driver.includes(selectedDriver));
+  }
+  if (searchQuery) {
+    filtered = filtered.filter(item => {
+      const text = (item.id + ' ' + item.req + ' ' + item.place + ' ' + item.driver + ' ' + (item.plate || '')).toLowerCase();
+      return text.includes(searchQuery);
+    });
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="empty-records-card">
+        <i class="bi bi-person-x"></i>
+        <div class="fw-medium">ไม่พบรายการภารกิจตามเงื่อนไขที่เลือก</div>
+        <small class="text-muted">ลองเปลี่ยนตัวกรองผู้ขับรถ หรือล้างคำค้นหา</small>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(item => `
+    <div class="mobile-record-card">
+      <div class="card-top">
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-bold font-heading">#${item.id}</span>
+          <span class="badge bg-light text-dark border"><i class="bi bi-truck me-1"></i>${item.plate || '-'}</span>
+        </div>
+        <span class="badge-status ${item.hasReported ? 'badge-status-completed' : 'badge-status-assigned'}">
+          ${item.hasReported ? 'บันทึกแล้ว' : 'รอลงไมล์'}
+        </span>
+      </div>
+
+      <div class="card-details">
+        <div class="detail-item">
+          <i class="bi bi-person-badge text-primary"></i>
+          <div>
+            <span class="detail-label">พขร.:</span>
+            <span class="detail-val fw-bold text-primary">${item.driver}</span>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="bi bi-clock-history text-primary"></i>
+          <div>
+            <span class="detail-label">วันเวลา:</span>
+            <span class="detail-val">${item.start} <span class="text-danger">ถึง ${item.end}</span></span>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="bi bi-geo-alt text-danger"></i>
+          <div>
+            <span class="detail-label">สถานที่:</span>
+            <span class="detail-val fw-medium">${item.place}</span>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="bi bi-person text-muted"></i>
+          <div>
+            <span class="detail-label">ผู้ขอ:</span>
+            <span class="detail-val text-muted">${item.req}</span>
+          </div>
+        </div>
+        ${item.hasReported ? `
+        <div class="detail-item bg-light p-2 rounded-3 mt-1">
+          <i class="bi bi-speedometer2 text-info"></i>
+          <div>
+            <span class="detail-label">ระยะทาง:</span>
+            <span class="detail-val fw-bold text-success">${item.diffKm} กิโลเมตร</span>
+          </div>
+        </div>` : ''}
+      </div>
+
+      <div class="card-action">
+        ${!item.hasReported
+          ? `<button class="btn btn-warning w-100 rounded-pill py-2 font-heading fw-bold text-dark shadow-sm" onclick="openDriver('${item.id}')">
+               <i class="bi bi-speedometer2 me-1"></i> บันทึกเวลา & เลขไมล์
+             </button>`
+          : `<button class="btn btn-outline-primary w-100 rounded-pill py-2 font-heading" onclick="openDriver('${item.id}')">
+               <i class="bi bi-pencil me-1"></i> แก้ไขรายงานไมล์ (${item.diffKm} กม.)
+             </button>`
+        }
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderMobileReportCards(items) {
+  currentReportCardsData = items || [];
+  reportCardsLimit = 15;
+  applyReportCardsFilter();
+}
+
+function applyReportCardsFilter() {
+  const container = document.getElementById('cardsReport');
+  const paginBtn = document.getElementById('cardsReportPagination');
+  if (!container) return;
+
+  const searchEl = document.getElementById('cardSearchInput_report');
+  const searchQuery = (searchEl?.value || '').toLowerCase().trim();
+
+  let filtered = currentReportCardsData;
+  if (searchQuery) {
+    filtered = filtered.filter(item => {
+      const text = (item.id + ' ' + item.req + ' ' + item.place + ' ' + (item.driver || '') + ' ' + (item.plate || '') + ' ' + item.status).toLowerCase();
+      return text.includes(searchQuery);
+    });
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="empty-records-card">
+        <i class="bi bi-search"></i>
+        <div class="fw-medium">ไม่พบประวัติการใช้รถตามที่ค้นหา</div>
+      </div>`;
+    if (paginBtn) paginBtn.style.display = 'none';
+    return;
+  }
+
+  const visibleItems = filtered.slice(0, reportCardsLimit);
+
+  container.innerHTML = visibleItems.map(item => `
+    <div class="mobile-record-card">
+      <div class="card-top">
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-bold font-heading">#${item.id}</span>
+          ${item.printCount > 0 ? `<span class="badge bg-info-subtle text-info-emphasis border border-info-subtle">พิมพ์ ${item.printCount}</span>` : ''}
+        </div>
+        <span class="badge-status ${item.badgeClass}">${item.status}</span>
+      </div>
+
+      <div class="card-details">
+        <div class="detail-item">
+          <i class="bi bi-calendar3 text-primary"></i>
+          <div>
+            <span class="detail-label">วันเวลา:</span>
+            <span class="detail-val">${item.start} <span class="text-danger">ถึง ${item.end}</span></span>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="bi bi-person text-primary"></i>
+          <div>
+            <span class="detail-label">ผู้ขอ:</span>
+            <span class="detail-val fw-medium">${item.req}</span>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="bi bi-geo-alt text-danger"></i>
+          <div>
+            <span class="detail-label">สถานที่:</span>
+            <span class="detail-val">${item.place}</span>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="bi bi-truck text-muted"></i>
+          <div>
+            <span class="detail-label">รถ / พขร.:</span>
+            <span class="detail-val">${item.plate || '-'} / ${item.driver || '-'}</span>
+          </div>
+        </div>
+        ${item.diffKm !== '' && item.diffKm !== null && item.diffKm !== undefined ? `
+        <div class="detail-item">
+          <i class="bi bi-speedometer2 text-info"></i>
+          <div>
+            <span class="detail-label">ระยะทาง:</span>
+            <span class="detail-val fw-bold text-success">${item.diffKm} กม.</span>
+          </div>
+        </div>` : ''}
+      </div>
+
+      <div class="card-action d-flex gap-2">
+        <button class="btn btn-outline-primary flex-fill rounded-pill py-2 font-heading" onclick="openView('${item.id}', false)">
+          <i class="bi bi-search me-1"></i> ดูรายละเอียด
+        </button>
+        <button class="btn btn-primary rounded-pill px-3 py-2 font-heading" onclick="openView('${item.id}', true)" title="สั่งพิมพ์เอกสาร A4">
+          <i class="bi bi-printer"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  if (paginBtn) {
+    paginBtn.style.display = filtered.length > reportCardsLimit ? 'block' : 'none';
+  }
+}
+
+function loadMoreReportCards() {
+  reportCardsLimit += 15;
+  applyReportCardsFilter();
+}
+
 function renderTables() {
   let assignData = [];
   let driverData = [];
   let reportData = [];
+
+  let assignCardsList = [];
+  let driverCardsList = [];
+  let reportCardsList = [];
 
   globalData.forEach(row => {
     if (!row || !row[0]) return;
@@ -3399,7 +4020,7 @@ function renderTables() {
       }
     }
 
-    // 1. ตารางจัดรถ (Assign Table)
+    // 1. ตารางจัดรถ (Assign Table & Cards)
     if (id && (!driver || !String(driver).includes('ยกเลิก'))) {
       const isAssigned = driver && driver.trim() !== '';
       const assignBtn = !isAssigned
@@ -3416,9 +4037,16 @@ function renderTables() {
         place,
         `<span class="badge bg-light text-dark border">${cType}</span>`
       ]);
+
+      assignCardsList.push({
+        id, start, end, req, subj, place, cType,
+        driver: driver || '',
+        plate: plate || '',
+        status, badgeClass, isAssigned
+      });
     }
 
-    // 2. ตารางรายงาน พขร. (Driver Table)
+    // 2. ตารางรายงาน พขร. (Driver Table & Cards)
     if (driver && id && !String(driver).includes('ยกเลิก')) {
       const hasReported = diffKm !== '' && diffKm !== null && diffKm !== undefined;
       const driverBtn = !hasReported
@@ -3435,9 +4063,16 @@ function renderTables() {
         `<span class="fw-medium">${driver}</span>`,
         `<span class="badge bg-light text-dark border">${plate || '-'}</span>`
       ]);
+
+      driverCardsList.push({
+        id, start, end, req, place, driver,
+        plate: plate || '',
+        diffKm: diffKm !== '' && diffKm !== null && diffKm !== undefined ? diffKm : '',
+        hasReported
+      });
     }
 
-    // 3. ตารางประวัติและพิมพ์ (Report Table)
+    // 3. ตารางประวัติและพิมพ์ (Report Table & Cards)
     if (id) {
       const printBadge = printCount > 0
         ? ` <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle">พิมพ์ ${printCount}</span>`
@@ -3455,27 +4090,46 @@ function renderTables() {
         plate || '-',
         diffKm !== '' && diffKm !== null && diffKm !== undefined ? `${diffKm} กม.` : '-'
       ]);
+
+      reportCardsList.push({
+        id, start, end, req, place,
+        driver: driver || '',
+        plate: plate || '',
+        diffKm: diffKm !== '' && diffKm !== null && diffKm !== undefined ? diffKm : '',
+        printCount, status, badgeClass
+      });
     }
   });
 
+  // อัปเดตตาราง DataTables
   updateDataTable('#tableAssign', assignData, [[1, 'desc']]);
 
   if (!$.fn.DataTable.isDataTable('#tableDriver')) {
     const tableDr = $('#tableDriver').DataTable({
       data: driverData,
       responsive: true,
+      autoWidth: false,
       language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
       order: [[1, 'desc']],
       stateSave: true
     });
     $('#filterDriver').off('change').on('change', function () {
-      tableDr.column(6).search(this.value).draw();
+      const selected = this.value;
+      tableDr.column(6).search(selected).draw();
+      applyDriverCardsFilter();
     });
   } else {
     $('#tableDriver').DataTable().clear().rows.add(driverData).draw(false);
   }
 
   updateDataTable('#tableReport', reportData, [[1, 'desc']]);
+
+  // อัปเดตการ์ดมุมมองมือถือ (Mobile Cards)
+  renderMobileAssignCards(assignCardsList);
+  renderMobileDriverCards(driverCardsList);
+  renderMobileReportCards(reportCardsList);
+
+  initTableViewModes();
 }
 
 function updateDataTable(selector, dataset, order) {
@@ -3485,6 +4139,7 @@ function updateDataTable(selector, dataset, order) {
     $(selector).DataTable({
       data: dataset,
       responsive: true,
+      autoWidth: false,
       language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
       order: order,
       stateSave: true
@@ -4178,6 +4833,13 @@ function switchPage(pageId, linkElement = null) {
   } else if (pageId === 'page-oil') {
     if (oilHistoryList.length === 0) loadOilData(false);
   }
+
+  // ปรับขนาดและคำนวณ Responsive DataTables เมื่อสลับหน้า
+  setTimeout(() => {
+    if ($.fn.DataTable) {
+      $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust().responsive.recalc();
+    }
+  }, 60);
 }
 
 async function checkLoginAndSwitch(pageId, linkElement = null) {
@@ -4322,11 +4984,15 @@ window.addEventListener('DOMContentLoaded', () => {
   setupDriverForm();
   setupOilModule();
   startRealtimeClock();
+  initTableViewModes();
 
   // Resize & orientation listeners
   window.addEventListener('resize', () => {
     if (sigPad1) sigPad1.resize();
     if (sigPad2) sigPad2.resize();
+    if ($.fn.DataTable) {
+      $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust().responsive.recalc();
+    }
   });
   window.addEventListener('orientationchange', () => {
     setTimeout(() => {
@@ -4334,6 +5000,9 @@ window.addEventListener('DOMContentLoaded', () => {
       if (sigPad2) sigPad2.resize();
       if (typeof renderCalendar === 'function' && document.getElementById('page-calendar')?.classList.contains('active')) {
         renderCalendar();
+      }
+      if ($.fn.DataTable) {
+        $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust().responsive.recalc();
       }
     }, 150);
   });
@@ -4389,6 +5058,11 @@ function toggleTheme() {
 
 window.toggleTheme = toggleTheme;
 window.setTheme = setTheme;
+window.switchTableViewMode = switchTableViewMode;
+window.filterCards = filterCards;
+window.applyDriverCardsFilter = applyDriverCardsFilter;
+window.applyReportCardsFilter = applyReportCardsFilter;
+window.loadMoreReportCards = loadMoreReportCards;
 
 
 </script>
