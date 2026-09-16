@@ -3701,11 +3701,34 @@ function filterCards(containerId, query) {
   });
 }
 
+function sortCardsLatestFirst(items) {
+  if (!items || !Array.isArray(items)) return [];
+  return items.slice().sort((a, b) => {
+    // 1. เปรียบเทียบ ID แบบตัวเลขธรรมชาติเรียงจากมากไปน้อย (คำขอล่าสุดอยู่บนสุด)
+    if (a.id && b.id && a.id !== b.id) {
+      const idCmp = String(b.id).localeCompare(String(a.id), undefined, { numeric: true, sensitivity: 'base' });
+      if (idCmp !== 0) return idCmp;
+    }
+    // 2. ถ้ามี Timestamp วันที่ส่งคำขอ ให้เปรียบเทียบเวลาเรียงจากใหม่ไปเก่า
+    if (a.rawTimestamp && b.rawTimestamp) {
+      const tA = new Date(a.rawTimestamp).getTime();
+      const tB = new Date(b.rawTimestamp).getTime();
+      if (!isNaN(tA) && !isNaN(tB) && tA !== tB) {
+        return tB - tA;
+      }
+    }
+    // 3. สำรอง: เรียงตามลำดับแถวในสเปรดชีตจากล่างขึ้นบน (แถวที่บันทึกล่าสุดจะอยู่ล่างสุด)
+    return (b.rowIndex !== undefined ? b.rowIndex : 0) - (a.rowIndex !== undefined ? a.rowIndex : 0);
+  });
+}
+
 function renderMobileAssignCards(items) {
   const container = document.getElementById('cardsAssign');
   if (!container) return;
 
-  if (!items || items.length === 0) {
+  const sortedItems = sortCardsLatestFirst(items);
+
+  if (!sortedItems || sortedItems.length === 0) {
     container.innerHTML = `
       <div class="empty-records-card">
         <i class="bi bi-inbox"></i>
@@ -3715,7 +3738,7 @@ function renderMobileAssignCards(items) {
     return;
   }
 
-  container.innerHTML = items.map(item => `
+  container.innerHTML = sortedItems.map(item => `
     <div class="mobile-record-card">
       <div class="card-top">
         <div class="d-flex align-items-center gap-2">
@@ -3779,7 +3802,7 @@ function renderMobileAssignCards(items) {
 }
 
 function renderMobileDriverCards(items) {
-  currentDriverCardsData = items || [];
+  currentDriverCardsData = sortCardsLatestFirst(items);
   applyDriverCardsFilter();
 }
 
@@ -3878,7 +3901,7 @@ function applyDriverCardsFilter() {
 }
 
 function renderMobileReportCards(items) {
-  currentReportCardsData = items || [];
+  currentReportCardsData = sortCardsLatestFirst(items);
   reportCardsLimit = 15;
   applyReportCardsFilter();
 }
@@ -3990,9 +4013,10 @@ function renderTables() {
   let driverCardsList = [];
   let reportCardsList = [];
 
-  globalData.forEach(row => {
+  globalData.forEach((row, rowIndex) => {
     if (!row || !row[0]) return;
     const id = row[0];
+    const rawTimestamp = row[1];
     const start = formatDateUI(row[4]);
     const end = formatDateUI(row[5]);
     const req = row[2] || '-';
@@ -4042,7 +4066,9 @@ function renderTables() {
         id, start, end, req, subj, place, cType,
         driver: driver || '',
         plate: plate || '',
-        status, badgeClass, isAssigned
+        status, badgeClass, isAssigned,
+        rowIndex,
+        rawTimestamp
       });
     }
 
@@ -4068,7 +4094,9 @@ function renderTables() {
         id, start, end, req, place, driver,
         plate: plate || '',
         diffKm: diffKm !== '' && diffKm !== null && diffKm !== undefined ? diffKm : '',
-        hasReported
+        hasReported,
+        rowIndex,
+        rawTimestamp
       });
     }
 
@@ -4096,12 +4124,14 @@ function renderTables() {
         driver: driver || '',
         plate: plate || '',
         diffKm: diffKm !== '' && diffKm !== null && diffKm !== undefined ? diffKm : '',
-        printCount, status, badgeClass
+        printCount, status, badgeClass,
+        rowIndex,
+        rawTimestamp
       });
     }
   });
 
-  // อัปเดตตาราง DataTables
+  // อัปเดตตาราง DataTables (เรียง ID จากมากไปน้อยเช่นกัน)
   updateDataTable('#tableAssign', assignData, [[1, 'desc']]);
 
   if (!$.fn.DataTable.isDataTable('#tableDriver')) {
@@ -4123,6 +4153,11 @@ function renderTables() {
   }
 
   updateDataTable('#tableReport', reportData, [[1, 'desc']]);
+
+  // จัดเรียงการ์ดคำขอล่าสุดให้อยู่บนสุดเสมอ (Latest First)
+  assignCardsList = sortCardsLatestFirst(assignCardsList);
+  driverCardsList = sortCardsLatestFirst(driverCardsList);
+  reportCardsList = sortCardsLatestFirst(reportCardsList);
 
   // อัปเดตการ์ดมุมมองมือถือ (Mobile Cards)
   renderMobileAssignCards(assignCardsList);
